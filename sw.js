@@ -5,6 +5,7 @@ const ASSETS = [
   'index.html',
   'styles.css',
   'manifest.webmanifest',
+  'NOTICE.md',
   'data/words.json',
   'src/app.js',
   'src/choices.js',
