@@ -15,7 +15,14 @@
 
   <header class="topbar">
     <div id="progress" class="progress">불러오는 중…</div>
+    <button id="settings-btn" class="text-btn" type="button" aria-expanded="false" aria-controls="settings">⚙ 설정</button>
   </header>
+
+  <div id="settings" class="settings" hidden>
+    <h2>하루 문제 수</h2>
+    <div id="daily-options" class="segmented" role="group" aria-label="하루 문제 수"></div>
+    <p id="settings-msg" class="menu-msg" role="status"></p>
+  </div>
 
   <main id="main" class="main">
     <section id="quiz" hidden>
@@ -36,7 +43,7 @@
       <p id="done-summary"></p>
       <h2>오늘 틀린 단어</h2>
       <ul id="done-wrong" class="wrong-list"></ul>
-      <p class="hint">내일 새 300문제가 열립니다.</p>
+      <p id="done-hint" class="hint"></p>
     </section>
 
     <section id="error" hidden>

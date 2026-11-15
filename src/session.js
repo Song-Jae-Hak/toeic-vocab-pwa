@@ -1,7 +1,9 @@
 import { weightedSample } from './sampler.js';
 import { getWeight, applyAnswer } from './weights.js';
+import { DEFAULT_DAILY_COUNT, DAILY_COUNT_OPTIONS, isValidDailyCount } from './settings.js';
 
-export const DAILY_COUNT = 300;
+export { DAILY_COUNT_OPTIONS };
+export const DAILY_COUNT = DEFAULT_DAILY_COUNT;
 export const UNKNOWN_INDEX = 4;
 
 export function todayString(now) {
@@ -17,7 +19,7 @@ export function ensureTodaySession(state, words, now, rng) {
   const ids = weightedSample(
     words.map((w) => w.id),
     (id) => getWeight(state.weights, id),
-    DAILY_COUNT,
+    state.settings?.dailyCount ?? DAILY_COUNT,
     rng,
   );
   return { ...state, session: { date, ids, answers: {} } };
@@ -61,4 +63,28 @@ export function shouldStartNewSession(state, now, { finished, hiddenMs }) {
   if (!state.session) return true;
   if (state.session.date === todayString(now)) return false;
   return finished || hiddenMs >= LONG_ABSENCE_MS;
+}
+
+// Change how many questions a day has. Applies to today's session right away: answered words are
+// always kept, unanswered ones are trimmed or topped up with new weighted picks.
+export function setDailyCount(state, words, count, rng) {
+  if (!isValidDailyCount(count)) return state;
+  const settings = { ...state.settings, dailyCount: count };
+  const session = state.session;
+  if (!session) return { ...state, settings };
+
+  const isAnswered = (id) => id in session.answers;
+  const answeredCount = session.ids.filter(isAnswered).length;
+  const need = count - answeredCount;
+  const unanswered = session.ids.filter((id) => !isAnswered(id));
+  const keep = new Set(unanswered.slice(0, Math.max(need, 0)));
+  let ids = session.ids.filter((id) => isAnswered(id) || keep.has(id));
+
+  const extra = need - keep.size;
+  if (extra > 0) {
+    const taken = new Set(ids);
+    const pool = words.map((w) => w.id).filter((id) => !taken.has(id));
+    ids = [...ids, ...weightedSample(pool, (id) => getWeight(state.weights, id), extra, rng)];
+  }
+  return { ...state, settings, session: { ...session, ids } };
 }

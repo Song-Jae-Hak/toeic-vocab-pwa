@@ -1,7 +1,9 @@
+import { DEFAULT_DAILY_COUNT, isValidDailyCount } from './settings.js';
+
 const KEY = 'toeic-vocab-v1';
 
 export function emptyState() {
-  return { version: 1, weights: {}, session: null };
+  return { version: 1, settings: { dailyCount: DEFAULT_DAILY_COUNT }, weights: {}, session: null };
 }
 
 function isObject(v) {
@@ -19,10 +21,16 @@ function validSession(s) {
   );
 }
 
+function validSettings(s) {
+  if (s === undefined) return true;
+  return isObject(s) && (s.dailyCount === undefined || isValidDailyCount(s.dailyCount));
+}
+
 function validState(s) {
   return (
     isObject(s) &&
     s.version === 1 &&
+    validSettings(s.settings) &&
     isObject(s.weights) &&
     Object.values(s.weights).every((w) => typeof w === 'number' && Number.isFinite(w)) &&
     validSession(s.session === undefined ? null : s.session)
@@ -30,7 +38,12 @@ function validState(s) {
 }
 
 function normalize(s) {
-  return { version: 1, weights: s.weights, session: s.session ?? null };
+  return {
+    version: 1,
+    settings: { dailyCount: s.settings?.dailyCount ?? DEFAULT_DAILY_COUNT },
+    weights: s.weights,
+    session: s.session ?? null,
+  };
 }
 
 export function loadState(store) {

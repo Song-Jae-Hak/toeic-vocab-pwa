@@ -12,6 +12,7 @@ function fakeStore(initial) {
 
 const sample = {
   version: 1,
+  settings: { dailyCount: 200 },
   weights: { 1: 3, 5: 0.8 },
   session: {
     date: '2026-11-15',
@@ -71,4 +72,27 @@ test('import rejects non-numeric weights', () => {
 
 test('import rejects a malformed session', () => {
   assert.equal(importState('{"version":1,"weights":{},"session":{"date":1}}').ok, false);
+});
+
+test('an older saved state without settings loads with the default dailyCount 300', () => {
+  const store = fakeStore({ 'toeic-vocab-v1': JSON.stringify({ version: 1, weights: { 1: 2 }, session: null }) });
+  const s = loadState(store);
+  assert.equal(s.settings.dailyCount, 300);
+  assert.deepEqual(s.weights, { 1: 2 });
+});
+
+test('emptyState has the default dailyCount 300', () => {
+  assert.equal(emptyState().settings.dailyCount, 300);
+});
+
+test('import accepts a file without settings and fills the default', () => {
+  const res = importState('{"version":1,"weights":{},"session":null}');
+  assert.equal(res.ok, true);
+  assert.equal(res.state.settings.dailyCount, 300);
+});
+
+test('import rejects an unsupported dailyCount', () => {
+  assert.equal(importState('{"version":1,"settings":{"dailyCount":250},"weights":{},"session":null}').ok, false);
+  assert.equal(importState('{"version":1,"settings":{"dailyCount":"200"},"weights":{},"session":null}').ok, false);
+  assert.equal(importState('{"version":1,"settings":5,"weights":{},"session":null}').ok, false);
 });

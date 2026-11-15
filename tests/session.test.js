@@ -138,3 +138,65 @@ test('shouldStartNewSession: new day during an active sitting does not interrupt
 test('shouldStartNewSession: no session yet starts one', () => {
   assert.equal(shouldStartNewSession(emptyState(), day1, { finished: false, hiddenMs: 0 }), true);
 });
+
+import { DAILY_COUNT_OPTIONS, setDailyCount } from '../src/session.js';
+
+test('DAILY_COUNT_OPTIONS are 100..500 in steps of 100', () => {
+  assert.deepEqual(DAILY_COUNT_OPTIONS, [100, 200, 300, 400, 500]);
+});
+
+test('a new session uses state.settings.dailyCount', () => {
+  const base = { ...emptyState(), settings: { dailyCount: 200 } };
+  const s = ensureTodaySession(base, words(1000), day1, lcg(1)).session;
+  assert.equal(s.ids.length, 200);
+});
+
+test('state without settings still uses 300', () => {
+  const { settings, ...legacy } = emptyState();
+  const s = ensureTodaySession(legacy, words(1000), day1, lcg(1)).session;
+  assert.equal(s.ids.length, 300);
+});
+
+function withAnswers(n) {
+  let st = ensureTodaySession(emptyState(), words(1000), day1, lcg(1));
+  for (let i = 0; i < n; i++) st = recordAnswer(st, st.session.ids[i], 0, true);
+  return st;
+}
+
+test('setDailyCount shrinks today\'s session but keeps every answered word, in order', () => {
+  const st = withAnswers(50);
+  const out = setDailyCount(st, words(1000), 200, lcg(2));
+  assert.equal(out.settings.dailyCount, 200);
+  assert.equal(out.session.ids.length, 200);
+  assert.deepEqual(out.session.ids.slice(0, 50), st.session.ids.slice(0, 50));
+  assert.equal(Object.keys(out.session.answers).length, 50);
+  assert.equal(currentIndex(out.session), 50);
+});
+
+test('setDailyCount grows the session with new distinct words and keeps old ones', () => {
+  const st = withAnswers(10);
+  const out = setDailyCount(st, words(1000), 500, lcg(3));
+  assert.equal(out.session.ids.length, 500);
+  assert.equal(new Set(out.session.ids).size, 500);
+  assert.deepEqual(out.session.ids.slice(0, 300), st.session.ids);
+});
+
+test('setDailyCount below the number already answered ends today\'s session at what was answered', () => {
+  const st = withAnswers(150);
+  const out = setDailyCount(st, words(1000), 100, lcg(4));
+  assert.equal(out.settings.dailyCount, 100);
+  assert.equal(out.session.ids.length, 150);
+  assert.equal(currentIndex(out.session), 150);
+});
+
+test('setDailyCount ignores values that are not offered', () => {
+  const st = withAnswers(5);
+  assert.deepEqual(setDailyCount(st, words(1000), 250, lcg(5)), st);
+  assert.deepEqual(setDailyCount(st, words(1000), 999, lcg(5)), st);
+});
+
+test('the chosen count is used again the next day', () => {
+  const st = setDailyCount(withAnswers(5), words(1000), 100, lcg(6));
+  const next = ensureTodaySession(st, words(1000), day2, lcg(7));
+  assert.equal(next.session.ids.length, 100);
+});

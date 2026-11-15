@@ -1,6 +1,6 @@
 import { loadState, saveState, exportState, importState } from './storage.js';
 import {
-  ensureTodaySession, currentIndex, recordAnswer, progress, shouldStartNewSession, UNKNOWN_INDEX,
+  ensureTodaySession, currentIndex, recordAnswer, progress, shouldStartNewSession, setDailyCount, DAILY_COUNT_OPTIONS, UNKNOWN_INDEX,
 } from './session.js';
 import { buildChoices } from './choices.js';
 
@@ -52,6 +52,7 @@ function renderDone() {
   const p = progress(state.session);
   $('done-summary').textContent = `${p.total}문제 중 ${p.correct}개 정답, ${p.wrong}개 오답`;
   const list = $('done-wrong');
+  $('done-hint').textContent = `내일 새 ${state.settings.dailyCount}문제가 열립니다.`;
   list.textContent = '';
   const wrongIds = state.session.ids.filter((id) => state.session.answers[id] && !state.session.answers[id].correct);
   if (wrongIds.length === 0) {
@@ -147,6 +148,35 @@ function setMenuMessage(text) {
   $('menu-msg').textContent = text;
 }
 
+function renderSettings() {
+  const box = $('daily-options');
+  box.textContent = '';
+  for (const n of DAILY_COUNT_OPTIONS) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.textContent = String(n);
+    b.setAttribute('aria-pressed', String(state.settings.dailyCount === n));
+    b.addEventListener('click', () => {
+      if (state.settings.dailyCount === n) return;
+      state = setDailyCount(state, words, n, Math.random);
+      persist();
+      renderSettings();
+      renderQuestion();
+      $('settings-msg').textContent = `하루 ${n}문제로 바꿨습니다. 오늘 푼 문제는 그대로 유지됩니다.`;
+    });
+    box.append(b);
+  }
+}
+
+function wireSettings() {
+  $('settings-btn').addEventListener('click', () => {
+    const open = $('settings').hidden;
+    $('settings').hidden = !open;
+    $('settings-btn').setAttribute('aria-expanded', String(open));
+    $('settings-msg').textContent = '';
+  });
+}
+
 function wireMenu() {
   $('export-btn').addEventListener('click', () => {
     const blob = new Blob([exportState(state)], { type: 'application/json' });
@@ -200,6 +230,7 @@ function wireResume() {
 
 async function start() {
   wireMenu();
+  wireSettings();
   wireResume();
   try {
     const res = await fetch('data/words.json');
@@ -214,6 +245,7 @@ async function start() {
   byId = new Map(words.map((w) => [w.id, w]));
   state = ensureTodaySession(loadState(safeStore()), words, new Date(), Math.random);
   persist();
+  renderSettings();
   renderQuestion();
 }
 

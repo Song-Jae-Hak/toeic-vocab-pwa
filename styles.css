@@ -136,3 +136,38 @@ h2 { font-size: 18px; margin-top: 24px; }
 
 .credit { text-align: center; color: var(--muted); font-size: 12px; padding: 16px; }
 .credit a { color: inherit; }
+
+.text-btn {
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--text);
+  border-radius: 10px;
+  min-height: 44px;
+  padding: 0 14px;
+  font-size: 15px;
+}
+.settings {
+  margin: 0 16px 8px;
+  padding: 12px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  max-width: 528px;
+}
+.settings h2 { font-size: 15px; margin: 0 0 10px; }
+.segmented { display: flex; gap: 6px; }
+.segmented button {
+  flex: 1;
+  min-height: 48px;
+  border-radius: 10px;
+  border: 2px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 16px;
+}
+.segmented button[aria-pressed="true"] {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: #fff;
+  font-weight: 700;
+}
