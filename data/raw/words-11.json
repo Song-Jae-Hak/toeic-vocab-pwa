@@ -273,5 +273,17 @@
 {"en":"craftsmanship","pos":"n","ko":"장인 정신"},
 {"en":"repute","pos":"n","ko":"평판"},
 {"en":"high-rise","pos":"adj","ko":"고층의"},
-{"en":"concretely","pos":"adv","ko":"구체적으로"}
+{"en":"concretely","pos":"adv","ko":"구체적으로"},
+{"en":"dig","pos":"v","ko":"파다"},
+{"en":"lock","pos":"v","ko":"잠그다"},
+{"en":"sneeze","pos":"v","ko":"재채기하다"},
+{"en":"frigid","pos":"adj","ko":"몹시 추운"},
+{"en":"breathtakingly","pos":"adv","ko":"숨이 막힐 만큼"},
+{"en":"ingenious","pos":"adj","ko":"기발한"},
+{"en":"dire","pos":"adj","ko":"심각한"},
+{"en":"vent","pos":"n","ko":"통풍구"},
+{"en":"eloquent","pos":"adj","ko":"웅변을 잘하는"},
+{"en":"erode","pos":"v","ko":"침식시키다"},
+{"en":"inquisitive","pos":"adj","ko":"호기심 많은"},
+{"en":"undue","pos":"adj","ko":"지나친"}
 ]
