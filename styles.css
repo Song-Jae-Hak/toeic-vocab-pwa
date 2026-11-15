@@ -116,7 +116,14 @@ body {
 .opt.wrong { background: var(--bad-bg); border-color: var(--bad-border); }
 .opt:disabled { opacity: 1; }
 
-.feedback { margin-top: 14px; }
+.feedback {
+  margin-top: 14px;
+  position: sticky;
+  bottom: 0;
+  padding: 10px 0 calc(10px + var(--safe-bottom));
+  background: var(--bg);
+}
+button { touch-action: manipulation; }
 #feedback-text { font-size: 18px; font-weight: 600; }
 .extra { color: var(--muted); font-size: 15px; margin-top: 4px; }
 .next {

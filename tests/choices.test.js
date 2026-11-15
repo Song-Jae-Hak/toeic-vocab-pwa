@@ -90,3 +90,17 @@ test('words sharing any "+"-joined group token are excluded as distractors', () 
     assert.ok(!options.includes('나'), `seed ${seed}: ${options}`);
   }
 });
+
+test('another word whose ko equals the answer word\'s ko2 is never a distractor', () => {
+  const ws = [
+    { id: 1, en: 'apparently', pos: 'adv', ko: '겉보기에', ko2: '분명히' },
+    { id: 2, en: 'clearly', pos: 'adv', ko: '분명히' },
+    { id: 3, en: 'rarely', pos: 'adv', ko: '드물게' },
+    { id: 4, en: 'nearly', pos: 'adv', ko: '거의' },
+    { id: 5, en: 'fully', pos: 'adv', ko: '완전히' },
+  ];
+  for (let seed = 1; seed <= 50; seed++) {
+    const { options } = buildChoices(ws[0], ws, lcg(seed));
+    assert.ok(!options.includes('분명히'), `seed ${seed}: ${options}`);
+  }
+});

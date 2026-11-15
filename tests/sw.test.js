@@ -6,7 +6,7 @@ import vm from 'node:vm';
 const root = new URL('../', import.meta.url);
 const source = readFileSync(new URL('sw.js', root), 'utf8');
 
-function load() {
+function load({ offline = false } = {}) {
   const listeners = {};
   const store = new Map(); // cacheName -> Map(url -> response)
   const added = [];
@@ -14,6 +14,7 @@ function load() {
     open: async (name) => {
       if (!store.has(name)) store.set(name, new Map());
       return {
+        put: async (req, res) => { store.get(name).set(req.url, res); },
         addAll: async (urls) => { added.push(...urls); urls.forEach((u) => store.get(name).set(u, `cached:${u}`)); },
       };
     },
@@ -30,7 +31,7 @@ function load() {
     clients: { claim: async () => {} },
   };
   const fetchCalls = [];
-  const sandbox = { self, caches, fetch: async (req) => { fetchCalls.push(req.url); return `net:${req.url}`; }, URL };
+  const sandbox = { self, caches, fetch: async (req) => { if (offline) throw new Error('offline'); fetchCalls.push(req.url); return { ok: true, clone() { return this; }, body: `net:${req.url}`, toString() { return this.body; } }; }, URL };
   vm.runInNewContext(source, sandbox);
   const run = async (type, event) => {
     let p;
@@ -63,11 +64,22 @@ test('activate removes caches with other names but keeps the current one', async
   assert.deepEqual([...sw.store.keys()], ['toeic-vocab-v1']);
 });
 
-test('fetch serves from cache first, falls back to the network, ignores non-GET', async () => {
+test('fetch is network-first: fresh response wins and refreshes the cache', async () => {
   const sw = load();
   await sw.run('install', {});
+  const res = await sw.run('fetch', { request: { method: 'GET', url: 'data/words.json' } });
+  assert.equal(String(res), 'net:data/words.json');
+  await new Promise((r) => setTimeout(r, 0));
+  assert.equal(String(sw.store.get('toeic-vocab-v1').get('data/words.json')), 'net:data/words.json');
+});
+
+test('fetch falls back to the cache when the network fails', async () => {
+  const sw = load({ offline: true });
+  await sw.run('install', {});
   assert.equal(await sw.run('fetch', { request: { method: 'GET', url: 'data/words.json' } }), 'cached:data/words.json');
-  assert.equal(await sw.run('fetch', { request: { method: 'GET', url: 'unknown.txt' } }), 'net:unknown.txt');
-  // A POST must not be intercepted: respondWith is never called, so nothing is returned.
+});
+
+test('fetch ignores non-GET requests', async () => {
+  const sw = load();
   assert.equal(await sw.run('fetch', { request: { method: 'POST', url: 'data/words.json' } }), undefined);
 });

@@ -52,3 +52,13 @@ export function progress(session) {
     wrong: answers.length - correct,
   };
 }
+
+const LONG_ABSENCE_MS = 60 * 60 * 1000;
+
+// Decide whether to open a new daily session when the app comes back to the foreground.
+// A sitting that is still active is never interrupted at midnight.
+export function shouldStartNewSession(state, now, { finished, hiddenMs }) {
+  if (!state.session) return true;
+  if (state.session.date === todayString(now)) return false;
+  return finished || hiddenMs >= LONG_ABSENCE_MS;
+}

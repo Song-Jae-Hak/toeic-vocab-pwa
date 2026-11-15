@@ -29,7 +29,7 @@ function shareGroup(a, b) {
 
 export function buildChoices(word, allWords, rng) {
   const eligible = allWords.filter(
-    (w) => w.id !== word.id && w.ko !== word.ko && !shareGroup(word, w),
+    (w) => w.id !== word.id && w.ko !== word.ko && w.ko !== word.ko2 && !shareGroup(word, w),
   );
   const samePos = shuffle(eligible.filter((w) => w.pos === word.pos), rng);
   const otherPos = shuffle(eligible.filter((w) => w.pos !== word.pos), rng);

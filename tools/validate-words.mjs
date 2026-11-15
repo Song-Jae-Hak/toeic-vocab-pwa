@@ -6,6 +6,7 @@ const POS = new Set(['n', 'v', 'adj', 'adv', 'prep', 'conj']);
 export function validateWords(words, { idCheck = true } = {}) {
   const problems = [];
   const seenEn = new Map();
+  const seenId = new Set();
   const groups = new Map();
   const required = idCheck ? ['id', 'en', 'pos', 'ko'] : ['en', 'pos', 'ko'];
 
@@ -14,7 +15,11 @@ export function validateWords(words, { idCheck = true } = {}) {
     for (const f of required) {
       if (w[f] === undefined || w[f] === null) problems.push(`${label}: missing field ${f}`);
     }
-    if (idCheck && w.id !== i + 1) problems.push(`${label}: id should be ${i + 1}, got ${w.id}`);
+    if (idCheck) {
+      if (!Number.isInteger(w.id) || w.id < 1) problems.push(`${label}: id must be a positive integer, got ${w.id}`);
+      else if (seenId.has(w.id)) problems.push(`${label}: duplicate id ${w.id}`);
+      else seenId.add(w.id);
+    }
     if (w.pos !== undefined && !POS.has(w.pos)) problems.push(`${label}: bad pos "${w.pos}"`);
     if (typeof w.en === 'string') {
       const key = w.en.trim().toLowerCase();

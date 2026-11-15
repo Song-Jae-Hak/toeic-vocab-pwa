@@ -30,9 +30,9 @@ test('unknown pos is reported', () => {
   assert.ok(validateWords(w).some((p) => /pos/i.test(p)));
 });
 
-test('non-consecutive ids are reported', () => {
+test('a duplicate id is reported', () => {
   const w = good();
-  w[2].id = 7;
+  w[2].id = 1;
   assert.ok(validateWords(w).some((p) => /id/i.test(p)));
 });
 
@@ -71,4 +71,14 @@ test('words sharing a "+"-joined group token count as a pair', () => {
   w[2].group = 'pair';
   w[1].group = 'up';
   assert.deepEqual(validateWords(w), []);
+});
+
+test('ids may have gaps but must be unique positive integers', () => {
+  const w = good();
+  w[2].id = 9;
+  assert.deepEqual(validateWords(w), []);
+  w[1].id = 9;
+  assert.ok(validateWords(w).some((p) => /id/i.test(p)));
+  w[1].id = 0;
+  assert.ok(validateWords(w).some((p) => /id/i.test(p)));
 });

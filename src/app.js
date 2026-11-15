@@ -1,6 +1,6 @@
 import { loadState, saveState, exportState, importState } from './storage.js';
 import {
-  ensureTodaySession, currentIndex, recordAnswer, progress, UNKNOWN_INDEX,
+  ensureTodaySession, currentIndex, recordAnswer, progress, shouldStartNewSession, UNKNOWN_INDEX,
 } from './session.js';
 import { buildChoices } from './choices.js';
 
@@ -103,7 +103,9 @@ function renderQuestion() {
   buttons.push(makeOption('5', '모르겠다', UNKNOWN_INDEX, true));
   buttons.forEach((b) => box.append(b));
 
-  let answered = false;
+  // Ignore taps right after rendering so a fast double tap on "다음" cannot answer the next question.
+  let answered = true;
+  setTimeout(() => { answered = false; }, 300);
   buttons.forEach((btn) => {
     btn.addEventListener('click', () => {
       if (answered) return;
@@ -155,9 +157,11 @@ function wireMenu() {
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
     a.download = `toeic-vocab-${state.session ? state.session.date : 'backup'}.json`;
+    document.body.append(a);
     a.click();
-    URL.revokeObjectURL(a.href);
-    setMenuMessage('기록을 내보냈습니다.');
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+    setMenuMessage('내보내기를 시작했습니다. 파일이 저장됐는지 확인하세요.');
   });
   $('import-btn').addEventListener('click', () => $('import-file').click());
   $('import-file').addEventListener('change', async (e) => {
@@ -178,8 +182,29 @@ function wireMenu() {
   $('next-btn').addEventListener('click', renderQuestion);
 }
 
+let hiddenAt = null;
+
+function wireResume() {
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') {
+      hiddenAt = Date.now();
+      return;
+    }
+    if (!state) return;
+    const hiddenMs = hiddenAt === null ? 0 : Date.now() - hiddenAt;
+    hiddenAt = null;
+    const finished = !$('done').hidden;
+    if (shouldStartNewSession(state, new Date(), { finished, hiddenMs })) {
+      state = ensureTodaySession(state, words, new Date(), Math.random);
+      persist();
+      renderQuestion();
+    }
+  });
+}
+
 async function start() {
   wireMenu();
+  wireResume();
   try {
     const res = await fetch('data/words.json');
     if (!res.ok) throw new Error(`HTTP ${res.status}`);

@@ -112,3 +112,29 @@ test('currentIndex equals ids.length once everything is answered', () => {
   for (const id of st.session.ids) st = recordAnswer(st, id, 0, true);
   assert.equal(currentIndex(st.session), 5);
 });
+
+import { shouldStartNewSession } from '../src/session.js';
+
+test('shouldStartNewSession: same day never starts a new session', () => {
+  const st = ensureTodaySession(emptyState(), words(1000), day1, lcg(1));
+  assert.equal(shouldStartNewSession(st, day1, { finished: true, hiddenMs: 9e9 }), false);
+});
+
+test('shouldStartNewSession: new day + finished screen starts one', () => {
+  const st = ensureTodaySession(emptyState(), words(1000), day1, lcg(1));
+  assert.equal(shouldStartNewSession(st, day2, { finished: true, hiddenMs: 0 }), true);
+});
+
+test('shouldStartNewSession: new day after a long absence starts one even if unfinished', () => {
+  const st = ensureTodaySession(emptyState(), words(1000), day1, lcg(1));
+  assert.equal(shouldStartNewSession(st, day2, { finished: false, hiddenMs: 2 * 3600 * 1000 }), true);
+});
+
+test('shouldStartNewSession: new day during an active sitting does not interrupt it', () => {
+  const st = ensureTodaySession(emptyState(), words(1000), day1, lcg(1));
+  assert.equal(shouldStartNewSession(st, day2, { finished: false, hiddenMs: 60 * 1000 }), false);
+});
+
+test('shouldStartNewSession: no session yet starts one', () => {
+  assert.equal(shouldStartNewSession(emptyState(), day1, { finished: false, hiddenMs: 0 }), true);
+});

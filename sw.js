@@ -1,4 +1,4 @@
-// Cache-first offline support. After changing any cached file, bump CACHE so phones pick up the update.
+// Network-first with cache fallback: updates show up on the next online load, and the app still works offline.
 const CACHE = 'toeic-vocab-v1';
 const ASSETS = [
   './',
@@ -34,6 +34,14 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
   event.respondWith(
-    caches.match(event.request).then((hit) => hit || fetch(event.request)),
+    fetch(event.request)
+      .then((res) => {
+        if (res && res.ok) {
+          const copy = res.clone();
+          caches.open(CACHE).then((cache) => cache.put(event.request, copy));
+        }
+        return res;
+      })
+      .catch(() => caches.match(event.request)),
   );
 });
