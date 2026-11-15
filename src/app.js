@@ -138,6 +138,8 @@ function renderQuestion() {
   $('pos').textContent = POS_LABEL[word.pos] ?? word.pos;
   $('word').textContent = word.en;
   $('feedback').hidden = true;
+  $('feedback-text').textContent = '';
+  $('feedback-extra').textContent = '';
   currentWordId = word.id;
   $('speak-btn').hidden = !audioIds.has(word.id);
   if (state.settings.autoPlay && audioIds.has(word.id)) playWord(word.id);
@@ -165,6 +167,8 @@ function renderQuestion() {
       if (!correct) btn.classList.add('wrong');
       showFeedback(word, correct, chosen === UNKNOWN_INDEX);
       renderProgress();
+      // Keep option 5 above the bottom "다음" bar: scrolls only when it would be covered.
+      buttons[buttons.length - 1].scrollIntoView({ block: 'nearest' });
       if (correct && state.settings.autoNext) {
         setTimeout(() => { if (token === questionToken) renderQuestion(); }, 700);
       }
@@ -235,7 +239,7 @@ function renderSettings() {
   };
   segmented('auto-options', [{ value: false, label: '끄기' }, { value: true, label: '켜기' }], s.autoNext, change('autoNext'));
   segmented('play-options', [{ value: false, label: '끄기' }, { value: true, label: '켜기' }], s.autoPlay, change('autoPlay'));
-  segmented('font-options', [{ value: 'normal', label: '보통' }, { value: 'large', label: '크게' }, { value: 'xlarge', label: '아주 크게' }], s.fontSize, change('fontSize'));
+  segmented('font-options', [{ value: 'small', label: '작게' }, { value: 'normal', label: '보통' }, { value: 'large', label: '크게' }, { value: 'xlarge', label: '아주 크게' }], s.fontSize, change('fontSize'));
   segmented('theme-options', [{ value: 'system', label: '기기 설정' }, { value: 'light', label: '밝게' }, { value: 'dark', label: '어둡게' }], s.theme, change('theme'));
 }
 

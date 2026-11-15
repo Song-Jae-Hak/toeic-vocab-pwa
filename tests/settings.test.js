@@ -28,3 +28,11 @@ test('autoPlay is a boolean setting that defaults to off', () => {
   assert.equal(withSetting(base, 'autoPlay', true).settings.autoPlay, true);
   assert.equal(withSetting(base, 'autoPlay', 'yes').settings.autoPlay, false);
 });
+
+import { FONT_SIZES } from '../src/settings.js';
+
+test('font sizes run from small to xlarge, with normal still the default', () => {
+  assert.deepEqual(FONT_SIZES, ['small', 'normal', 'large', 'xlarge']);
+  assert.equal(DEFAULT_SETTINGS.fontSize, 'normal');
+  assert.equal(withSetting(base, 'fontSize', 'small').settings.fontSize, 'small');
+});

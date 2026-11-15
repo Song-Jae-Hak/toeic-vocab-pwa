@@ -125,3 +125,7 @@ test('import rejects a non-boolean autoPlay', () => {
   assert.equal(importState('{"version":1,"settings":{"autoPlay":"yes"},"weights":{},"session":null}').ok, false);
   assert.equal(importState('{"version":1,"settings":{"autoPlay":true},"weights":{},"session":null}').ok, true);
 });
+
+test('import accepts the small font size', () => {
+  assert.equal(importState('{"version":1,"settings":{"fontSize":"small"},"weights":{},"session":null}').ok, true);
+});

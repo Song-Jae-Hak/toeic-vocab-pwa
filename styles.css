@@ -119,19 +119,20 @@ body {
 .opt.correct { background: var(--ok-bg); border-color: var(--ok-border); }
 .opt.wrong { background: var(--bad-bg); border-color: var(--bad-border); }
 .opt:disabled { opacity: 1; }
+.opt { scroll-margin-bottom: 84px; }
 
 .feedback {
-  margin-top: 14px;
+  margin-top: 12px;
   position: sticky;
   bottom: 0;
-  padding: 10px 0 calc(10px + var(--safe-bottom));
+  padding: 8px 0 calc(8px + var(--safe-bottom));
   background: var(--bg);
 }
 button { touch-action: manipulation; }
-#feedback-text { font-size: var(--fb-size, 18px); font-weight: 600; }
+.answer { font-size: var(--fb-size, 18px); font-weight: 600; margin-top: 10px; min-height: 1.4em; }
 .extra { color: var(--muted); font-size: var(--extra-size, 15px); margin-top: 4px; }
 .next {
-  margin-top: 12px;
+  margin-top: 0;
   width: 100%;
   min-height: 52px;
   border: none;
@@ -185,6 +186,7 @@ h2 { font-size: 18px; margin-top: 24px; }
   font-weight: 700;
 }
 
+:root[data-font-size="small"] { --word-size: 28px; --opt-size: 15px; --fb-size: 16px; --extra-size: 13px; }
 :root[data-font-size="large"] { --word-size: 40px; --opt-size: 19px; --fb-size: 20px; --extra-size: 17px; }
 :root[data-font-size="xlarge"] { --word-size: 46px; --opt-size: 22px; --fb-size: 22px; --extra-size: 19px; }
 
@@ -214,4 +216,16 @@ h2 { font-size: 18px; margin-top: 24px; }
   background: var(--bg);
   color: var(--text);
   font-size: 16px;
+}
+
+/* Short phones: keep all five options and the "다음" bar on screen at once. */
+@media (max-height: 720px) {
+  .topbar { padding: 8px 16px; }
+  .card { padding: 14px 12px; margin-bottom: 10px; }
+  .word { font-size: min(var(--word-size, 34px), 32px); }
+  .options { gap: 8px; }
+  .opt { min-height: 48px; padding: 8px 12px; }
+  .answer { margin-top: 6px; }
+  .speak { margin-top: 8px; min-height: 40px; }
+  .next { min-height: 48px; }
 }

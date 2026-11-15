@@ -1,6 +1,6 @@
 export const DEFAULT_DAILY_COUNT = 300;
 export const DAILY_COUNT_OPTIONS = [100, 200, 300, 400, 500];
-export const FONT_SIZES = ['normal', 'large', 'xlarge'];
+export const FONT_SIZES = ['small', 'normal', 'large', 'xlarge'];
 export const THEMES = ['system', 'light', 'dark'];
 
 export const DEFAULT_SETTINGS = Object.freeze({
