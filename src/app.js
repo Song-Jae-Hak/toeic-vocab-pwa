@@ -148,10 +148,6 @@ function setMenuMessage(text) {
 }
 
 function wireMenu() {
-  $('menu-btn').addEventListener('click', () => {
-    $('menu').hidden = !$('menu').hidden;
-    setMenuMessage('');
-  });
   $('export-btn').addEventListener('click', () => {
     const blob = new Blob([exportState(state)], { type: 'application/json' });
     const a = document.createElement('a');
