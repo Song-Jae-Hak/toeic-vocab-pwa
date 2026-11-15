@@ -6,6 +6,9 @@
   <meta name="theme-color" content="#2f5bd8">
   <title>토익 단어</title>
   <link rel="stylesheet" href="styles.css">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
 </head>
 <body>
   <div id="banner" class="banner" hidden>기록을 저장할 수 없습니다. 브라우저 저장 설정을 확인하세요.</div>
@@ -50,5 +53,10 @@
   </main>
 
   <script type="module" src="src/app.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js').catch((e) => console.warn('service worker failed', e));
+    }
+  </script>
 </body>
 </html>
