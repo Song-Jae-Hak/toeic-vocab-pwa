@@ -1,0 +1,60 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { validateWords } from '../tools/validate-words.mjs';
+
+const good = () => [
+  { id: 1, en: 'increase', pos: 'v', ko: '증가하다', group: 'up' },
+  { id: 2, en: 'rise', pos: 'v', ko: '오르다', group: 'up' },
+  { id: 3, en: 'invoice', pos: 'n', ko: '송장' },
+];
+
+test('a valid list has no problems', () => {
+  assert.deepEqual(validateWords(good()), []);
+});
+
+test('duplicate en (case-insensitive) is reported', () => {
+  const w = good();
+  w[2].en = 'Increase';
+  assert.ok(validateWords(w).some((p) => /duplicate/i.test(p)));
+});
+
+test('missing required field is reported', () => {
+  const w = good();
+  delete w[2].ko;
+  assert.ok(validateWords(w).some((p) => /missing/i.test(p)));
+});
+
+test('unknown pos is reported', () => {
+  const w = good();
+  w[2].pos = 'noun';
+  assert.ok(validateWords(w).some((p) => /pos/i.test(p)));
+});
+
+test('non-consecutive ids are reported', () => {
+  const w = good();
+  w[2].id = 7;
+  assert.ok(validateWords(w).some((p) => /id/i.test(p)));
+});
+
+test('empty ko is reported', () => {
+  const w = good();
+  w[2].ko = '  ';
+  assert.ok(validateWords(w).some((p) => /ko/i.test(p)));
+});
+
+test('ko made only of latin letters is reported', () => {
+  const w = good();
+  w[2].ko = 'invoice';
+  assert.ok(validateWords(w).some((p) => /ko/i.test(p)));
+});
+
+test('a group with a single word is reported', () => {
+  const w = good();
+  w[2].group = 'lonely';
+  assert.ok(validateWords(w).some((p) => /group/i.test(p)));
+});
+
+test('idCheck:false skips the id and single-word-group checks (per-batch mode)', () => {
+  const w = good().map((x) => ({ ...x, id: 0 }));
+  assert.deepEqual(validateWords(w, { idCheck: false }), []);
+});
