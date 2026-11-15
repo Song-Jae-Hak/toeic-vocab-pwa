@@ -5,10 +5,45 @@ import {
 import { buildChoices } from './choices.js';
 import { withSetting } from './settings.js';
 import { summary, topWrong } from './stats.js';
+import { AUDIO_CACHE, loadAudioBlob, parseManifest } from './audio.js';
 import { todayString } from './session.js';
 
 const $ = (id) => document.getElementById(id);
 const POS_LABEL = { n: '명사', v: '동사', adj: '형용사', adv: '부사', prep: '전치사', conj: '접속사', phr: '구문' };
+
+let audioIds = new Set();
+let audioCache = null;
+let currentAudio = null;
+let currentAudioUrl = null;
+let currentWordId = null;
+
+async function loadAudioManifest() {
+  try {
+    audioCache = 'caches' in window ? await caches.open(AUDIO_CACHE) : null;
+  } catch {
+    audioCache = null;
+  }
+  try {
+    const res = await fetch('audio/manifest.json', { cache: 'no-cache' });
+    if (res.ok) audioIds = parseManifest(await res.json());
+  } catch {
+    /* no audio available (offline first run or not generated yet) */
+  }
+}
+
+async function playWord(id) {
+  const blob = await loadAudioBlob(id, { cache: audioCache });
+  if (!blob) return;
+  if (currentAudio) currentAudio.pause();
+  if (currentAudioUrl) URL.revokeObjectURL(currentAudioUrl);
+  currentAudioUrl = URL.createObjectURL(blob);
+  currentAudio = new Audio(currentAudioUrl);
+  try {
+    await currentAudio.play();
+  } catch {
+    /* the browser blocked auto-play until the first tap: the 🔊 button still works */
+  }
+}
 
 let words = [];
 let byId = new Map();
@@ -103,6 +138,9 @@ function renderQuestion() {
   $('pos').textContent = POS_LABEL[word.pos] ?? word.pos;
   $('word').textContent = word.en;
   $('feedback').hidden = true;
+  currentWordId = word.id;
+  $('speak-btn').hidden = !audioIds.has(word.id);
+  if (state.settings.autoPlay && audioIds.has(word.id)) playWord(word.id);
 
   const box = $('options');
   box.textContent = '';
@@ -196,6 +234,7 @@ function renderSettings() {
     $('settings-msg').textContent = '';
   };
   segmented('auto-options', [{ value: false, label: '끄기' }, { value: true, label: '켜기' }], s.autoNext, change('autoNext'));
+  segmented('play-options', [{ value: false, label: '끄기' }, { value: true, label: '켜기' }], s.autoPlay, change('autoPlay'));
   segmented('font-options', [{ value: 'normal', label: '보통' }, { value: 'large', label: '크게' }, { value: 'xlarge', label: '아주 크게' }], s.fontSize, change('fontSize'));
   segmented('theme-options', [{ value: 'system', label: '기기 설정' }, { value: 'light', label: '밝게' }, { value: 'dark', label: '어둡게' }], s.theme, change('theme'));
 }
@@ -253,6 +292,9 @@ function wireSettings() {
     renderStats();
   });
   $('stats-back').addEventListener('click', renderQuestion);
+  $('speak-btn').addEventListener('click', () => {
+    if (currentWordId !== null) playWord(currentWordId);
+  });
 }
 
 function wireMenu() {
@@ -321,6 +363,7 @@ async function start() {
     return;
   }
   byId = new Map(words.map((w) => [w.id, w]));
+  await loadAudioManifest();
   state = ensureTodaySession(loadState(safeStore()), words, new Date(), Math.random);
   persist();
   applyAppearance();

@@ -56,12 +56,13 @@ test('install caches the whole asset list under toeic-vocab-v1', async () => {
   assert.ok(sw.added.includes('src/session.js'));
 });
 
-test('activate removes caches with other names but keeps the current one', async () => {
+test('activate removes old app caches but keeps the current one and the audio cache', async () => {
   const sw = load();
   await sw.run('install', {});
-  sw.store.set('old-cache', new Map());
+  sw.store.set('toeic-vocab-v0', new Map());
+  sw.store.set('toeic-audio-v1', new Map());
   await sw.run('activate', {});
-  assert.deepEqual([...sw.store.keys()], ['toeic-vocab-v1']);
+  assert.deepEqual([...sw.store.keys()].sort(), ['toeic-audio-v1', 'toeic-vocab-v1']);
 });
 
 test('fetch is network-first: fresh response wins and refreshes the cache', async () => {
@@ -92,4 +93,9 @@ test('every src/*.js module is in the offline asset list', () => {
   const modules = readdirSync(new URL('src/', root)).filter((f) => f.endsWith('.js')).map((f) => `src/${f}`);
   const missing = modules.filter((f) => !assets.has(f));
   assert.deepEqual(missing, [], `not cached offline: ${missing.join(', ')}`);
+});
+
+test('mp3 requests are not intercepted (the app handles audio itself)', async () => {
+  const sw = load();
+  assert.equal(await sw.run('fetch', { request: { method: 'GET', url: 'https://x.example/app/audio/12.mp3' } }), undefined);
 });

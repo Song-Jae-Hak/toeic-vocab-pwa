@@ -22,3 +22,9 @@ test('withSetting accepts autoNext booleans and font sizes', () => {
   assert.equal(withSetting(base, 'autoNext', true).settings.autoNext, true);
   assert.equal(withSetting(base, 'fontSize', 'xlarge').settings.fontSize, 'xlarge');
 });
+
+test('autoPlay is a boolean setting that defaults to off', () => {
+  assert.equal(DEFAULT_SETTINGS.autoPlay, false);
+  assert.equal(withSetting(base, 'autoPlay', true).settings.autoPlay, true);
+  assert.equal(withSetting(base, 'autoPlay', 'yes').settings.autoPlay, false);
+});

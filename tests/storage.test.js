@@ -12,7 +12,7 @@ function fakeStore(initial) {
 
 const sample = {
   version: 1,
-  settings: { dailyCount: 200, autoNext: true, fontSize: 'large', theme: 'dark' },
+  settings: { dailyCount: 200, autoNext: true, autoPlay: true, fontSize: 'large', theme: 'dark' },
   stats: { words: { 1: { right: 2, wrong: 1 } }, days: { '2026-11-15': { n: 3, right: 2 } } },
   weights: { 1: 3, 5: 0.8 },
   session: {
@@ -101,7 +101,7 @@ test('import rejects an unsupported dailyCount', () => {
 test('older saved state gets defaults for the newer settings and stats', () => {
   const store = fakeStore({ 'toeic-vocab-v1': JSON.stringify({ version: 1, settings: { dailyCount: 100 }, weights: {}, session: null }) });
   const s = loadState(store);
-  assert.deepEqual(s.settings, { dailyCount: 100, autoNext: false, fontSize: 'normal', theme: 'system' });
+  assert.deepEqual(s.settings, { dailyCount: 100, autoNext: false, autoPlay: false, fontSize: 'normal', theme: 'system' });
   assert.deepEqual(s.stats, { words: {}, days: {} });
 });
 
@@ -119,4 +119,9 @@ test('import rejects malformed stats', () => {
   assert.equal(importState(base({ words: { 1: { right: -1, wrong: 0 } }, days: {} })).ok, false);
   assert.equal(importState(base({ words: {}, days: { d: { n: 'a', right: 0 } } })).ok, false);
   assert.equal(importState(base({ words: {}, days: {} })).ok, true);
+});
+
+test('import rejects a non-boolean autoPlay', () => {
+  assert.equal(importState('{"version":1,"settings":{"autoPlay":"yes"},"weights":{},"session":null}').ok, false);
+  assert.equal(importState('{"version":1,"settings":{"autoPlay":true},"weights":{},"session":null}').ok, true);
 });

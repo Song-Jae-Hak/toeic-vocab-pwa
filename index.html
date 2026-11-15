@@ -25,6 +25,9 @@
     <h2>정답이면 자동으로 다음 문제</h2>
     <div id="auto-options" class="segmented" role="group" aria-label="자동 다음"></div>
 
+    <h2>발음 자동 재생</h2>
+    <div id="play-options" class="segmented" role="group" aria-label="발음 자동 재생"></div>
+
     <h2>글자 크기</h2>
     <div id="font-options" class="segmented" role="group" aria-label="글자 크기"></div>
 
@@ -40,6 +43,7 @@
       <div class="card">
         <div id="pos" class="pos"></div>
         <div id="word" class="word"></div>
+        <button id="speak-btn" class="speak" type="button" aria-label="발음 듣기" hidden>🔊 발음 듣기</button>
       </div>
       <div id="options" class="options"></div>
       <div id="feedback" class="feedback" hidden>

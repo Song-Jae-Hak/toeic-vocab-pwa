@@ -204,3 +204,14 @@ h2 { font-size: 18px; margin-top: 24px; }
 .stats-grid dt { color: var(--muted); font-size: 13px; }
 .stats-grid dd { margin: 4px 0 0; font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; }
 .wrong-list .meta { color: var(--muted); font-size: 13px; margin-left: 6px; }
+
+.speak {
+  margin-top: 12px;
+  min-height: 44px;
+  padding: 0 18px;
+  border-radius: 22px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 16px;
+}

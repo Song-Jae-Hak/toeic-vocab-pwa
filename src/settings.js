@@ -6,6 +6,7 @@ export const THEMES = ['system', 'light', 'dark'];
 export const DEFAULT_SETTINGS = Object.freeze({
   dailyCount: DEFAULT_DAILY_COUNT,
   autoNext: false,
+  autoPlay: false,
   fontSize: 'normal',
   theme: 'system',
 });
@@ -17,6 +18,7 @@ export function isValidDailyCount(n) {
 const CHECKS = {
   dailyCount: isValidDailyCount,
   autoNext: (v) => typeof v === 'boolean',
+  autoPlay: (v) => typeof v === 'boolean',
   fontSize: (v) => FONT_SIZES.includes(v),
   theme: (v) => THEMES.includes(v),
 };

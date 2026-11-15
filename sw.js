@@ -8,6 +8,7 @@ const ASSETS = [
   'NOTICE.md',
   'data/words.json',
   'src/app.js',
+  'src/audio.js',
   'src/choices.js',
   'src/sampler.js',
   'src/session.js',
@@ -29,13 +30,15 @@ self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches
       .keys()
-      .then((keys) => Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k))))
+      .then((keys) => Promise.all(keys.filter((k) => k.startsWith('toeic-vocab-') && k !== CACHE).map((k) => caches.delete(k))))
       .then(() => self.clients.claim()),
   );
 });
 
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
+  // Audio is cached by the app itself (Cache API + blob URLs); iOS Safari needs Range support for SW-served media.
+  if (/\.mp3(\?|$)/.test(event.request.url)) return;
   event.respondWith(
     fetch(event.request)
       .then((res) => {
