@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#2f5bd8">
+  <title>토익 단어</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="banner" class="banner" hidden>기록을 저장할 수 없습니다. 브라우저 저장 설정을 확인하세요.</div>
+
+  <header class="topbar">
+    <div id="progress" class="progress">불러오는 중…</div>
+    <button id="menu-btn" class="icon-btn" type="button" aria-label="설정">⋯</button>
+  </header>
+
+  <div id="menu" class="menu" hidden>
+    <button id="export-btn" type="button">기록 내보내기</button>
+    <button id="import-btn" type="button">기록 가져오기</button>
+    <input id="import-file" type="file" accept="application/json,.json" hidden>
+    <p id="menu-msg" class="menu-msg" role="status"></p>
+  </div>
+
+  <main id="main" class="main">
+    <section id="quiz" hidden>
+      <div class="card">
+        <div id="pos" class="pos"></div>
+        <div id="word" class="word"></div>
+      </div>
+      <div id="options" class="options"></div>
+      <div id="feedback" class="feedback" hidden>
+        <div id="feedback-text"></div>
+        <div id="feedback-extra" class="extra"></div>
+        <button id="next-btn" class="next" type="button">다음</button>
+      </div>
+    </section>
+
+    <section id="done" hidden>
+      <h1>오늘 학습 끝!</h1>
+      <p id="done-summary"></p>
+      <h2>오늘 틀린 단어</h2>
+      <ul id="done-wrong" class="wrong-list"></ul>
+      <p class="hint">내일 새 300문제가 열립니다.</p>
+    </section>
+
+    <section id="error" hidden>
+      <p id="error-text"></p>
+    </section>
+  </main>
+
+  <script type="module" src="src/app.js"></script>
+</body>
+</html>
