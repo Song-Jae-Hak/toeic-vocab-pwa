@@ -28,11 +28,21 @@
     <h2>발음 자동 재생</h2>
     <div id="play-options" class="segmented" role="group" aria-label="발음 자동 재생"></div>
 
+    <h2>5번 이상 맞힌 단어 그만 내기</h2>
+    <div id="mastered-options" class="segmented" role="group" aria-label="5번 이상 맞힌 단어 그만 내기"></div>
+
     <h2>글자 크기</h2>
     <div id="font-options" class="segmented" role="group" aria-label="글자 크기"></div>
 
     <h2>화면 색</h2>
     <div id="theme-options" class="segmented" role="group" aria-label="화면 색"></div>
+
+    <h2>기록 백업</h2>
+    <div class="backup" role="group" aria-label="기록 백업">
+      <button id="export-btn" type="button">기록 내보내기</button>
+      <button id="import-btn" type="button">기록 가져오기</button>
+      <input id="import-file" type="file" accept="application/json,.json" hidden>
+    </div>
 
     <button id="stats-btn" class="wide-btn" type="button">📊 통계 · 오답 노트 보기</button>
     <p id="settings-msg" class="menu-msg" role="status"></p>
@@ -73,12 +83,6 @@
       <p id="error-text"></p>
     </section>
   </main>
-  <section class="backup" aria-label="기록 백업">
-    <button id="export-btn" type="button">기록 내보내기</button>
-    <button id="import-btn" type="button">기록 가져오기</button>
-    <input id="import-file" type="file" accept="application/json,.json" hidden>
-    <p id="menu-msg" class="menu-msg" role="status"></p>
-  </section>
 
   <footer class="credit">단어 출처: TOEIC Service List (Browne &amp; Culligan, CC BY-SA 4.0) 외 · <a href="NOTICE.md">자세히</a></footer>
 

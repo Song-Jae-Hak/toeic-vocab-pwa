@@ -69,3 +69,15 @@ test('topWrong breaks ties on wrong count by lower accuracy', () => {
   const s = build([['d', 1, false], ['d', 1, true], ['d', 1, true], ['d', 2, false]]);
   assert.deepEqual(topWrong(s, 5).map((w) => w.id), [2, 1]);
 });
+
+import { isMastered, MASTERED_RIGHT } from '../src/stats.js';
+
+test('a word is mastered once it has been answered right 5 times, wrong answers aside', () => {
+  assert.equal(MASTERED_RIGHT, 5);
+  const stats = { words: { 1: { right: 4, wrong: 0 }, 2: { right: 5, wrong: 7 }, 3: { right: 9, wrong: 0 } }, days: {} };
+  assert.equal(isMastered(stats, 1), false);
+  assert.equal(isMastered(stats, 2), true);
+  assert.equal(isMastered(stats, 3), true);
+  assert.equal(isMastered(stats, 4), false);
+  assert.equal(isMastered(undefined, 1), false);
+});
