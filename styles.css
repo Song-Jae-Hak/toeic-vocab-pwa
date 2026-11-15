@@ -70,25 +70,17 @@ body {
 .progress { font-size: 15px; color: var(--muted); font-variant-numeric: tabular-nums; }
 
 
-.backup {
-  max-width: 560px;
-  margin: 8px auto 0;
-  padding: 16px 16px 0;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  border-top: 1px solid var(--border);
-}
+.backup { display: flex; flex-wrap: wrap; gap: 6px; }
 .backup button {
   flex: 1 1 140px;
-  min-height: 44px;
+  min-height: 48px;
   border-radius: 10px;
   border: 1px solid var(--border);
-  background: var(--card);
+  background: var(--bg);
   color: var(--text);
-  font-size: 15px;
+  font-size: 16px;
 }
-.menu-msg { flex-basis: 100%; margin: 0; font-size: 14px; color: var(--muted); min-height: 1em; }
+.menu-msg { margin: 8px 0 0; font-size: 14px; color: var(--muted); min-height: 1em; }
 
 .main { padding: 0 16px calc(24px + var(--safe-bottom)); max-width: 560px; margin: 0 auto; }
 

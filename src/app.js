@@ -197,7 +197,7 @@ function showFeedback(word, correct, unknown) {
 }
 
 function setMenuMessage(text) {
-  $('menu-msg').textContent = text;
+  $('settings-msg').textContent = text;
 }
 
 function segmented(boxId, options, current, onPick) {
