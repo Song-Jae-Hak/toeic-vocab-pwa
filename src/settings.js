@@ -9,6 +9,7 @@ export const DEFAULT_SETTINGS = Object.freeze({
   autoPlay: false,
   fontSize: 'normal',
   theme: 'system',
+  hideMastered: false,
 });
 
 export function isValidDailyCount(n) {
@@ -21,6 +22,7 @@ const CHECKS = {
   autoPlay: (v) => typeof v === 'boolean',
   fontSize: (v) => FONT_SIZES.includes(v),
   theme: (v) => THEMES.includes(v),
+  hideMastered: (v) => typeof v === 'boolean',
 };
 
 // A settings object is valid if it is an object whose present fields all have allowed values.

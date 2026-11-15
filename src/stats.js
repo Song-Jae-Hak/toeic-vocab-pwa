@@ -1,4 +1,11 @@
 // Long-term learning stats: per word right/wrong counts and per day answered counts.
+// A word answered right this many times in total counts as learned.
+export const MASTERED_RIGHT = 5;
+
+export function isMastered(stats, id) {
+  return (stats?.words?.[id]?.right ?? 0) >= MASTERED_RIGHT;
+}
+
 export function emptyStats() {
   return { words: {}, days: {} };
 }
