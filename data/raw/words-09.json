@@ -407,7 +407,6 @@
 {"en":"walk-in","pos":"adj","ko":"예약 없이 방문하는"},
 {"en":"warm up","pos":"v","ko":"준비 운동을 하다"},
 {"en":"web page","pos":"n","ko":"웹 페이지"},
-{"en":"website","pos":"n","ko":"웹사이트"},
 {"en":"wholesale price","pos":"n","ko":"도매가"},
 {"en":"win-win","pos":"adj","ko":"상생의"},
 {"en":"word of mouth","pos":"n","ko":"입소문"},
@@ -418,6 +417,5 @@
 {"en":"wrap up","pos":"v","ko":"마무리하다"},
 {"en":"write down","pos":"v","ko":"적어 두다"},
 {"en":"write off","pos":"v","ko":"손실 처리하다"},
-{"en":"year-end","pos":"n","ko":"연말"},
-{"en":"zero","pos":"n","ko":"영"}
+{"en":"year-end","pos":"n","ko":"연말"}
 ]
