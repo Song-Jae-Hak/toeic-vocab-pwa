@@ -18,12 +18,18 @@ function uniqueKo(candidates, seen) {
   return out;
 }
 
+function groupTokens(w) {
+  return w.group ? w.group.split('+') : [];
+}
+
+function shareGroup(a, b) {
+  const tokens = new Set(groupTokens(a));
+  return groupTokens(b).some((t) => tokens.has(t));
+}
+
 export function buildChoices(word, allWords, rng) {
   const eligible = allWords.filter(
-    (w) =>
-      w.id !== word.id &&
-      w.ko !== word.ko &&
-      !(word.group && w.group === word.group),
+    (w) => w.id !== word.id && w.ko !== word.ko && !shareGroup(word, w),
   );
   const samePos = shuffle(eligible.filter((w) => w.pos === word.pos), rng);
   const otherPos = shuffle(eligible.filter((w) => w.pos !== word.pos), rng);

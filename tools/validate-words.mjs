@@ -25,7 +25,9 @@ export function validateWords(words, { idCheck = true } = {}) {
       if (w.ko.trim() === '') problems.push(`${label}: empty ko`);
       else if (/^[A-Za-z\s]+$/.test(w.ko)) problems.push(`${label}: ko is latin letters only`);
     }
-    if (w.group) groups.set(w.group, (groups.get(w.group) ?? 0) + 1);
+    if (w.group) {
+      for (const g of w.group.split('+')) groups.set(g, (groups.get(g) ?? 0) + 1);
+    }
   });
 
   for (const [g, n] of idCheck ? groups : []) {

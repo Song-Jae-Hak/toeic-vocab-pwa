@@ -58,3 +58,17 @@ test('idCheck:false skips the id and single-word-group checks (per-batch mode)',
   const w = good().map((x) => ({ ...x, id: 0 }));
   assert.deepEqual(validateWords(w, { idCheck: false }), []);
 });
+
+test('a "+"-joined group token used by only one word is reported', () => {
+  const w = good();
+  w[0].group = 'up+solo';
+  assert.ok(validateWords(w).some((p) => /solo/.test(p)));
+});
+
+test('words sharing a "+"-joined group token count as a pair', () => {
+  const w = good();
+  w[0].group = 'up+pair';
+  w[2].group = 'pair';
+  w[1].group = 'up';
+  assert.deepEqual(validateWords(w), []);
+});

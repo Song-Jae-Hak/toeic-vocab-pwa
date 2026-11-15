@@ -8,6 +8,21 @@ for (const f of files) {
   merged.push(...JSON.parse(readFileSync(new URL(f, dir), 'utf8')));
 }
 const words = merged.map((w, i) => ({ id: i + 1, ...w }));
+
+// Apply synonym groups from data/groups.json. A word in several groups gets "a+b".
+const groups = JSON.parse(readFileSync(new URL('../data/groups.json', import.meta.url), 'utf8'));
+const byEn = new Map(words.map((w) => [w.en.toLowerCase(), w]));
+for (const [name, members] of Object.entries(groups)) {
+  const found = members.map((m) => byEn.get(m.toLowerCase())).filter(Boolean);
+  if (found.length < 2) {
+    console.log(`skip group "${name}": only ${found.length} member(s) found`);
+    continue;
+  }
+  for (const w of found) {
+    w.group = w.group ? `${w.group}+${name}` : name;
+  }
+}
+
 const problems = validateWords(words);
 if (problems.length) {
   console.error(problems.slice(0, 80).join('\n'));
@@ -15,4 +30,4 @@ if (problems.length) {
   process.exit(1);
 }
 writeFileSync(new URL('../data/words.json', import.meta.url), JSON.stringify(words));
-console.log(`Merged ${files.length} files → ${words.length} words`);
+console.log(`Merged ${files.length} files → ${words.length} words (${words.filter((w) => w.group).length} grouped)`);

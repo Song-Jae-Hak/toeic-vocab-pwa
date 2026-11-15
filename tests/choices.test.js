@@ -76,3 +76,17 @@ test('answer position varies with the rng', () => {
   }
   assert.ok(positions.size > 1);
 });
+
+test('words sharing any "+"-joined group token are excluded as distractors', () => {
+  const ws = [
+    { id: 1, en: 'a', pos: 'v', ko: '가', group: 'x+y' },
+    { id: 2, en: 'b', pos: 'v', ko: '나', group: 'y' },
+    { id: 3, en: 'c', pos: 'v', ko: '다' },
+    { id: 4, en: 'd', pos: 'v', ko: '라' },
+    { id: 5, en: 'e', pos: 'v', ko: '마' },
+  ];
+  for (let seed = 1; seed <= 50; seed++) {
+    const { options } = buildChoices(ws[0], ws, lcg(seed));
+    assert.ok(!options.includes('나'), `seed ${seed}: ${options}`);
+  }
+});
