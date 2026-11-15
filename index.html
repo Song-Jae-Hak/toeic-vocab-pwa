@@ -21,6 +21,17 @@
   <div id="settings" class="settings" hidden>
     <h2>하루 문제 수</h2>
     <div id="daily-options" class="segmented" role="group" aria-label="하루 문제 수"></div>
+
+    <h2>정답이면 자동으로 다음 문제</h2>
+    <div id="auto-options" class="segmented" role="group" aria-label="자동 다음"></div>
+
+    <h2>글자 크기</h2>
+    <div id="font-options" class="segmented" role="group" aria-label="글자 크기"></div>
+
+    <h2>화면 색</h2>
+    <div id="theme-options" class="segmented" role="group" aria-label="화면 색"></div>
+
+    <button id="stats-btn" class="wide-btn" type="button">📊 통계 · 오답 노트 보기</button>
     <p id="settings-msg" class="menu-msg" role="status"></p>
   </div>
 
@@ -44,6 +55,14 @@
       <h2>오늘 틀린 단어</h2>
       <ul id="done-wrong" class="wrong-list"></ul>
       <p id="done-hint" class="hint"></p>
+    </section>
+
+    <section id="stats" hidden>
+      <h1>학습 통계</h1>
+      <dl id="stats-summary" class="stats-grid"></dl>
+      <h2>오답 노트 <span class="hint">(많이 틀린 순)</span></h2>
+      <ul id="stats-wrong" class="wrong-list"></ul>
+      <button id="stats-back" class="next" type="button">돌아가기</button>
     </section>
 
     <section id="error" hidden>

@@ -1,6 +1,7 @@
 import { weightedSample } from './sampler.js';
 import { getWeight, applyAnswer } from './weights.js';
 import { DEFAULT_DAILY_COUNT, DAILY_COUNT_OPTIONS, isValidDailyCount } from './settings.js';
+import { emptyStats, recordStat } from './stats.js';
 
 export { DAILY_COUNT_OPTIONS };
 export const DAILY_COUNT = DEFAULT_DAILY_COUNT;
@@ -37,6 +38,7 @@ export function recordAnswer(state, wordId, chosen, correct) {
   return {
     ...state,
     weights: applyAnswer(state.weights, wordId, isCorrect),
+    stats: recordStat(state.stats ?? emptyStats(), wordId, isCorrect, session.date),
     session: {
       ...session,
       answers: { ...session.answers, [wordId]: { chosen, correct: isCorrect } },

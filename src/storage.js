@@ -1,9 +1,10 @@
-import { DEFAULT_DAILY_COUNT, isValidDailyCount } from './settings.js';
+import { DEFAULT_SETTINGS, isValidSettings, normalizeSettings } from './settings.js';
+import { emptyStats } from './stats.js';
 
 const KEY = 'toeic-vocab-v1';
 
 export function emptyState() {
-  return { version: 1, settings: { dailyCount: DEFAULT_DAILY_COUNT }, weights: {}, session: null };
+  return { version: 1, settings: { ...DEFAULT_SETTINGS }, stats: emptyStats(), weights: {}, session: null };
 }
 
 function isObject(v) {
@@ -21,16 +22,22 @@ function validSession(s) {
   );
 }
 
-function validSettings(s) {
+function validStats(s) {
   if (s === undefined) return true;
-  return isObject(s) && (s.dailyCount === undefined || isValidDailyCount(s.dailyCount));
+  if (!isObject(s) || !isObject(s.words) || !isObject(s.days)) return false;
+  const count = (n) => Number.isInteger(n) && n >= 0;
+  return (
+    Object.values(s.words).every((w) => isObject(w) && count(w.right) && count(w.wrong)) &&
+    Object.values(s.days).every((d) => isObject(d) && count(d.n) && count(d.right))
+  );
 }
 
 function validState(s) {
   return (
     isObject(s) &&
     s.version === 1 &&
-    validSettings(s.settings) &&
+    isValidSettings(s.settings) &&
+    validStats(s.stats) &&
     isObject(s.weights) &&
     Object.values(s.weights).every((w) => typeof w === 'number' && Number.isFinite(w)) &&
     validSession(s.session === undefined ? null : s.session)
@@ -40,7 +47,8 @@ function validState(s) {
 function normalize(s) {
   return {
     version: 1,
-    settings: { dailyCount: s.settings?.dailyCount ?? DEFAULT_DAILY_COUNT },
+    settings: normalizeSettings(s.settings),
+    stats: s.stats ?? emptyStats(),
     weights: s.weights,
     session: s.session ?? null,
   };

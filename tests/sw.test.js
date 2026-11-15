@@ -83,3 +83,13 @@ test('fetch ignores non-GET requests', async () => {
   const sw = load();
   assert.equal(await sw.run('fetch', { request: { method: 'POST', url: 'data/words.json' } }), undefined);
 });
+
+import { readdirSync } from 'node:fs';
+
+test('every src/*.js module is in the offline asset list', () => {
+  const m = source.match(/const ASSETS = \[([\s\S]*?)\];/);
+  const assets = new Set([...m[1].matchAll(/'([^']+)'/g)].map((x) => x[1]));
+  const modules = readdirSync(new URL('src/', root)).filter((f) => f.endsWith('.js')).map((f) => `src/${f}`);
+  const missing = modules.filter((f) => !assets.has(f));
+  assert.deepEqual(missing, [], `not cached offline: ${missing.join(', ')}`);
+});

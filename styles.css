@@ -13,7 +13,7 @@
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="light"]) {
     --bg: #12151d;
     --card: #1b2030;
     --text: #e8ecf6;
@@ -25,6 +25,19 @@
     --bad-bg: #402020;
     --bad-border: #ef6b6b;
   }
+}
+
+:root[data-theme="dark"] {
+  --bg: #12151d;
+  --card: #1b2030;
+  --text: #e8ecf6;
+  --muted: #9aa3b8;
+  --border: #2d3550;
+  --accent: #7c9bff;
+  --ok-bg: #173a24;
+  --ok-border: #43c26a;
+  --bad-bg: #402020;
+  --bad-border: #ef6b6b;
 }
 
 * { box-sizing: border-box; }
@@ -88,14 +101,14 @@ body {
   margin-bottom: 16px;
 }
 .pos { color: var(--muted); font-size: 14px; margin-bottom: 6px; }
-.word { font-size: 34px; font-weight: 700; word-break: break-word; }
+.word { font-size: var(--word-size, 34px); font-weight: 700; word-break: break-word; }
 
 .options { display: flex; flex-direction: column; gap: 10px; }
 .opt {
   min-height: 56px;
   padding: 12px 14px;
   text-align: left;
-  font-size: 17px;
+  font-size: var(--opt-size, 17px);
   border-radius: 12px;
   border: 2px solid var(--border);
   background: var(--card);
@@ -115,8 +128,8 @@ body {
   background: var(--bg);
 }
 button { touch-action: manipulation; }
-#feedback-text { font-size: 18px; font-weight: 600; }
-.extra { color: var(--muted); font-size: 15px; margin-top: 4px; }
+#feedback-text { font-size: var(--fb-size, 18px); font-weight: 600; }
+.extra { color: var(--muted); font-size: var(--extra-size, 15px); margin-top: 4px; }
 .next {
   margin-top: 12px;
   width: 100%;
@@ -171,3 +184,23 @@ h2 { font-size: 18px; margin-top: 24px; }
   color: #fff;
   font-weight: 700;
 }
+
+:root[data-font-size="large"] { --word-size: 40px; --opt-size: 19px; --fb-size: 20px; --extra-size: 17px; }
+:root[data-font-size="xlarge"] { --word-size: 46px; --opt-size: 22px; --fb-size: 22px; --extra-size: 19px; }
+
+.settings h2:not(:first-child) { margin-top: 14px; }
+.wide-btn {
+  margin-top: 16px;
+  width: 100%;
+  min-height: 48px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 16px;
+}
+.stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 0 0 8px; }
+.stats-grid div { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 12px; }
+.stats-grid dt { color: var(--muted); font-size: 13px; }
+.stats-grid dd { margin: 4px 0 0; font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.wrong-list .meta { color: var(--muted); font-size: 13px; margin-left: 6px; }

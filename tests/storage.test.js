@@ -12,7 +12,8 @@ function fakeStore(initial) {
 
 const sample = {
   version: 1,
-  settings: { dailyCount: 200 },
+  settings: { dailyCount: 200, autoNext: true, fontSize: 'large', theme: 'dark' },
+  stats: { words: { 1: { right: 2, wrong: 1 } }, days: { '2026-11-15': { n: 3, right: 2 } } },
   weights: { 1: 3, 5: 0.8 },
   session: {
     date: '2026-11-15',
@@ -95,4 +96,27 @@ test('import rejects an unsupported dailyCount', () => {
   assert.equal(importState('{"version":1,"settings":{"dailyCount":250},"weights":{},"session":null}').ok, false);
   assert.equal(importState('{"version":1,"settings":{"dailyCount":"200"},"weights":{},"session":null}').ok, false);
   assert.equal(importState('{"version":1,"settings":5,"weights":{},"session":null}').ok, false);
+});
+
+test('older saved state gets defaults for the newer settings and stats', () => {
+  const store = fakeStore({ 'toeic-vocab-v1': JSON.stringify({ version: 1, settings: { dailyCount: 100 }, weights: {}, session: null }) });
+  const s = loadState(store);
+  assert.deepEqual(s.settings, { dailyCount: 100, autoNext: false, fontSize: 'normal', theme: 'system' });
+  assert.deepEqual(s.stats, { words: {}, days: {} });
+});
+
+test('import rejects invalid autoNext, fontSize and theme values', () => {
+  const base = (settings) => JSON.stringify({ version: 1, settings, weights: {}, session: null });
+  assert.equal(importState(base({ autoNext: 'yes' })).ok, false);
+  assert.equal(importState(base({ fontSize: 'huge' })).ok, false);
+  assert.equal(importState(base({ theme: 'blue' })).ok, false);
+  assert.equal(importState(base({ autoNext: true, fontSize: 'xlarge', theme: 'light' })).ok, true);
+});
+
+test('import rejects malformed stats', () => {
+  const base = (stats) => JSON.stringify({ version: 1, stats, weights: {}, session: null });
+  assert.equal(importState(base('x')).ok, false);
+  assert.equal(importState(base({ words: { 1: { right: -1, wrong: 0 } }, days: {} })).ok, false);
+  assert.equal(importState(base({ words: {}, days: { d: { n: 'a', right: 0 } } })).ok, false);
+  assert.equal(importState(base({ words: {}, days: {} })).ok, true);
 });

@@ -3,6 +3,9 @@ import {
   ensureTodaySession, currentIndex, recordAnswer, progress, shouldStartNewSession, setDailyCount, DAILY_COUNT_OPTIONS, UNKNOWN_INDEX,
 } from './session.js';
 import { buildChoices } from './choices.js';
+import { withSetting } from './settings.js';
+import { summary, topWrong } from './stats.js';
+import { todayString } from './session.js';
 
 const $ = (id) => document.getElementById(id);
 const POS_LABEL = { n: '명사', v: '동사', adj: '형용사', adv: '부사', prep: '전치사', conj: '접속사', phr: '구문' };
@@ -40,7 +43,7 @@ function dateSeed(date) {
 }
 
 function show(section) {
-  for (const id of ['quiz', 'done', 'error']) $(id).hidden = id !== section;
+  for (const id of ['quiz', 'done', 'error', 'stats']) $(id).hidden = id !== section;
 }
 
 function renderProgress() {
@@ -70,7 +73,11 @@ function renderDone() {
   show('done');
 }
 
+let questionToken = 0;
+
 function renderQuestion() {
+  questionToken++;
+  const token = questionToken;
   const session = state.session;
   const idx = currentIndex(session);
   renderProgress();
@@ -120,6 +127,9 @@ function renderQuestion() {
       if (!correct) btn.classList.add('wrong');
       showFeedback(word, correct, chosen === UNKNOWN_INDEX);
       renderProgress();
+      if (correct && state.settings.autoNext) {
+        setTimeout(() => { if (token === questionToken) renderQuestion(); }, 700);
+      }
     });
   });
   show('quiz');
@@ -148,24 +158,86 @@ function setMenuMessage(text) {
   $('menu-msg').textContent = text;
 }
 
-function renderSettings() {
-  const box = $('daily-options');
+function segmented(boxId, options, current, onPick) {
+  const box = $(boxId);
   box.textContent = '';
-  for (const n of DAILY_COUNT_OPTIONS) {
+  for (const { value, label } of options) {
     const b = document.createElement('button');
     b.type = 'button';
-    b.textContent = String(n);
-    b.setAttribute('aria-pressed', String(state.settings.dailyCount === n));
+    b.textContent = label;
+    b.setAttribute('aria-pressed', String(current === value));
     b.addEventListener('click', () => {
-      if (state.settings.dailyCount === n) return;
-      state = setDailyCount(state, words, n, Math.random);
-      persist();
-      renderSettings();
-      renderQuestion();
-      $('settings-msg').textContent = `하루 ${n}문제로 바꿨습니다. 오늘 푼 문제는 그대로 유지됩니다.`;
+      if (current !== value) onPick(value);
     });
     box.append(b);
   }
+}
+
+function applyAppearance() {
+  const root = document.documentElement;
+  root.dataset.theme = state.settings.theme;
+  root.dataset.fontSize = state.settings.fontSize;
+}
+
+function renderSettings() {
+  const s = state.settings;
+  segmented('daily-options', DAILY_COUNT_OPTIONS.map((n) => ({ value: n, label: String(n) })), s.dailyCount, (n) => {
+    state = setDailyCount(state, words, n, Math.random);
+    persist();
+    renderSettings();
+    renderQuestion();
+    $('settings-msg').textContent = `하루 ${n}문제로 바꿨습니다. 오늘 푼 문제는 그대로 유지됩니다.`;
+  });
+  const change = (key) => (value) => {
+    state = withSetting(state, key, value);
+    persist();
+    applyAppearance();
+    renderSettings();
+    $('settings-msg').textContent = '';
+  };
+  segmented('auto-options', [{ value: false, label: '끄기' }, { value: true, label: '켜기' }], s.autoNext, change('autoNext'));
+  segmented('font-options', [{ value: 'normal', label: '보통' }, { value: 'large', label: '크게' }, { value: 'xlarge', label: '아주 크게' }], s.fontSize, change('fontSize'));
+  segmented('theme-options', [{ value: 'system', label: '기기 설정' }, { value: 'light', label: '밝게' }, { value: 'dark', label: '어둡게' }], s.theme, change('theme'));
+}
+
+function renderStats() {
+  const sm = summary(state.stats, todayString(new Date()));
+  const grid = $('stats-summary');
+  grid.textContent = '';
+  for (const [label, value] of [
+    ['푼 문제', `${sm.totalAnswered}개`],
+    ['정답률', `${sm.accuracy}%`],
+    ['연속 학습일', `${sm.streak}일`],
+    ['학습한 날', `${sm.daysStudied}일`],
+  ]) {
+    const box = document.createElement('div');
+    const dt = document.createElement('dt');
+    const dd = document.createElement('dd');
+    dt.textContent = label;
+    dd.textContent = value;
+    box.append(dt, dd);
+    grid.append(box);
+  }
+  const list = $('stats-wrong');
+  list.textContent = '';
+  const wrong = topWrong(state.stats, 30).filter((w) => byId.has(w.id));
+  if (wrong.length === 0) {
+    const li = document.createElement('li');
+    li.textContent = '아직 틀린 단어가 없어요.';
+    list.append(li);
+  }
+  for (const w of wrong) {
+    const word = byId.get(w.id);
+    const li = document.createElement('li');
+    li.textContent = `${word.en} — ${word.ko}`;
+    const meta = document.createElement('span');
+    meta.className = 'meta';
+    meta.textContent = `틀림 ${w.wrong} · 맞음 ${w.right}`;
+    li.append(meta);
+    list.append(li);
+  }
+  show('stats');
+  window.scrollTo(0, 0);
 }
 
 function wireSettings() {
@@ -175,6 +247,12 @@ function wireSettings() {
     $('settings-btn').setAttribute('aria-expanded', String(open));
     $('settings-msg').textContent = '';
   });
+  $('stats-btn').addEventListener('click', () => {
+    $('settings').hidden = true;
+    $('settings-btn').setAttribute('aria-expanded', 'false');
+    renderStats();
+  });
+  $('stats-back').addEventListener('click', renderQuestion);
 }
 
 function wireMenu() {
@@ -245,6 +323,7 @@ async function start() {
   byId = new Map(words.map((w) => [w.id, w]));
   state = ensureTodaySession(loadState(safeStore()), words, new Date(), Math.random);
   persist();
+  applyAppearance();
   renderSettings();
   renderQuestion();
 }

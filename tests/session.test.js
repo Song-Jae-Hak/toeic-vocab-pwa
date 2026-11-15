@@ -200,3 +200,20 @@ test('the chosen count is used again the next day', () => {
   const next = ensureTodaySession(st, words(1000), day2, lcg(7));
   assert.equal(next.session.ids.length, 100);
 });
+
+test('recordAnswer updates the long-term stats once per word, with the session date', () => {
+  const a = ensureTodaySession(emptyState(), words(1000), day1, lcg(1));
+  const id = a.session.ids[0];
+  const r1 = recordAnswer(a, id, 0, true);
+  assert.deepEqual(r1.stats.words[id], { right: 1, wrong: 0 });
+  assert.deepEqual(r1.stats.days['2026-11-15'], { n: 1, right: 1 });
+  const r2 = recordAnswer(r1, id, 1, false); // repeated answer is ignored
+  assert.deepEqual(r2.stats, r1.stats);
+});
+
+test('모르겠다 counts as wrong in the stats', () => {
+  const a = ensureTodaySession(emptyState(), words(1000), day1, lcg(1));
+  const id = a.session.ids[0];
+  const r = recordAnswer(a, id, UNKNOWN_INDEX, true);
+  assert.deepEqual(r.stats.words[id], { right: 0, wrong: 1 });
+});

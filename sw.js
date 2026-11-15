@@ -11,6 +11,8 @@ const ASSETS = [
   'src/choices.js',
   'src/sampler.js',
   'src/session.js',
+  'src/settings.js',
+  'src/stats.js',
   'src/storage.js',
   'src/weights.js',
   'icons/icon.svg',
