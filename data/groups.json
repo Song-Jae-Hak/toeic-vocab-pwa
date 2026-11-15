@@ -1,69 +1,901 @@
 {
-  "increase": ["increase", "rise", "grow", "expand", "boost", "escalate", "surge", "soar", "enlarge", "augment", "amplify", "multiply"],
-  "decrease": ["decrease", "decline", "reduce", "lessen", "diminish", "shrink", "cut", "curtail", "lower", "downsize", "slash"],
-  "begin": ["launch", "initiate", "commence", "inaugurate", "embark", "undertake"],
-  "end": ["terminate", "cease", "conclude", "finalize", "discontinue", "halt", "suspend"],
-  "approve": ["approve", "authorize", "endorse", "ratify", "sanction", "consent"],
-  "reject": ["reject", "refuse", "deny", "turn down", "disapprove", "veto"],
-  "help": ["assist", "aid", "support", "facilitate"],
-  "check": ["inspect", "examine", "review", "verify", "confirm", "scrutinize", "audit", "investigate", "monitor", "assess", "evaluate", "appraise"],
-  "give": ["provide", "supply", "furnish", "offer", "donate", "grant", "distribute", "dispense", "deliver"],
-  "get": ["obtain", "acquire", "gain", "attain", "secure", "procure", "receive"],
-  "choose": ["select", "choose", "nominate", "designate", "appoint", "elect", "opt"],
-  "important": ["essential", "vital", "crucial", "critical", "indispensable", "imperative", "key", "fundamental", "primary", "principal", "major"],
-  "big": ["considerable", "substantial", "significant", "enormous", "massive", "immense", "vast", "tremendous", "sizable"],
-  "small": ["minor", "slight", "trivial", "insignificant", "negligible", "minimal"],
-  "quick": ["prompt", "swift", "rapid", "immediate", "instant", "brisk"],
-  "immediately": ["immediately", "promptly", "momentarily"],
-  "fix": ["repair", "restore", "renovate", "refurbish", "revamp", "overhaul", "rehabilitate", "remedy"],
-  "change": ["alter", "modify", "adjust", "revise", "amend", "adapt", "convert", "transform", "switch"],
-  "say": ["state", "declare", "announce", "proclaim", "express", "mention", "remark", "assert", "claim"],
-  "show": ["display", "exhibit", "demonstrate", "illustrate", "reveal", "indicate", "present", "showcase", "depict", "portray", "unveil"],
-  "stop": ["prevent", "prohibit", "forbid", "ban", "restrict", "hinder", "impede", "obstruct", "hamper", "inhibit", "curb"],
-  "keep": ["maintain", "retain", "preserve", "conserve", "sustain", "uphold"],
-  "pay": ["reimburse", "compensate", "refund", "repay", "remit"],
-  "cost": ["cost", "expense", "expenditure", "outlay", "fee", "charge", "fare", "tariff", "toll"],
-  "money": ["income", "earnings", "revenue", "salary", "wage", "payroll", "remuneration"],
-  "rule": ["regulation", "policy", "guideline", "statute", "protocol", "directive", "provision"],
-  "plan": ["scheme", "strategy", "plan", "blueprint", "agenda", "initiative"],
-  "goal": ["objective", "target", "aim", "purpose", "mission"],
-  "worker": ["employee", "staff", "personnel", "workforce", "associate", "colleague"],
-  "boss": ["supervisor", "manager", "executive", "superintendent", "chairman", "chairperson", "director"],
-  "customer": ["customer", "client", "patron", "consumer"],
-  "company": ["firm", "corporation", "enterprise", "company", "subsidiary", "affiliate"],
-  "problem": ["issue", "problem", "difficulty", "obstacle", "hurdle", "barrier", "setback", "glitch", "drawback", "flaw", "defect"],
-  "agreement": ["agreement", "contract", "consensus", "deal", "treaty", "compromise"],
-  "cheap": ["affordable", "inexpensive", "economical", "reasonable", "low-cost", "cost-effective"],
-  "expensive": ["lavish", "luxurious", "extravagant", "premium"],
-  "famous": ["renowned", "prominent", "eminent", "prestigious", "noted", "notable", "well-known", "distinguished"],
-  "enough": ["sufficient", "adequate", "ample", "plentiful", "abundant"],
-  "kind": ["courteous", "polite", "generous", "hospitable", "considerate", "cordial"],
-  "careful": ["cautious", "prudent", "careful", "thorough", "meticulous", "diligent", "conscientious", "discreet", "wary"],
-  "happy": ["thrilled", "delighted", "pleased", "cheerful", "enthusiastic", "eager"],
-  "talk": ["discuss", "negotiate", "consult", "confer", "debate", "communicate"],
-  "meeting": ["conference", "meeting", "seminar", "symposium", "workshop", "convention", "forum", "summit", "session"],
-  "gather": ["collect", "gather", "assemble", "accumulate", "compile"],
-  "join": ["combine", "merge", "unite", "integrate", "consolidate", "incorporate", "connect"],
-  "split": ["separate", "divide", "split", "detach", "isolate", "disassemble"],
-  "limit": ["limit", "restrict", "confine", "cap", "restraint", "constraint", "restriction", "limitation"],
-  "ask": ["inquire", "request", "query", "solicit", "demand"],
-  "answer": ["reply", "respond", "react"],
-  "tell": ["inform", "notify", "advise", "alert", "apprise", "remind"],
-  "persuade": ["persuade", "convince", "encourage", "motivate", "urge", "induce", "inspire"],
-  "damage": ["damage", "harm", "injure", "impair", "deteriorate", "degrade"],
-  "future": ["upcoming", "forthcoming", "impending", "imminent"],
-  "past": ["previous", "former", "prior", "preceding"],
-  "main": ["main", "chief", "primary", "principal", "prime", "leading", "dominant", "foremost"],
-  "whole": ["entire", "complete", "total", "overall", "comprehensive", "extensive"],
-  "exact": ["accurate", "precise", "exact", "correct"],
-  "tough": ["strict", "rigid", "rigorous", "harsh", "severe"],
-  "stable": ["steady", "stable", "consistent", "constant", "continual", "continuous", "reliable", "dependable"],
-  "ability": ["ability", "capability", "competence", "proficiency", "expertise", "skill", "talent", "aptitude", "capacity"],
-  "skilled": ["skilled", "competent", "proficient", "capable", "adept", "qualified"],
-  "benefit": ["benefit", "advantage", "merit", "incentive", "reward"],
-  "trip": ["trip", "journey", "tour", "excursion", "voyage", "expedition"],
-  "building": ["facility", "premises", "establishment", "institution"],
-  "store": ["store", "shop", "boutique", "retailer", "outlet", "supermarket", "grocery", "marketplace"],
-  "ensure": ["ensure", "guarantee", "assure"],
-  "mandatory": ["mandatory", "compulsory", "obligatory"]
+  "increase": [
+    "increase",
+    "rise",
+    "grow",
+    "expand",
+    "boost",
+    "escalate",
+    "surge",
+    "soar",
+    "enlarge",
+    "augment",
+    "amplify",
+    "multiply"
+  ],
+  "decrease": [
+    "decrease",
+    "decline",
+    "reduce",
+    "lessen",
+    "diminish",
+    "shrink",
+    "cut",
+    "curtail",
+    "lower",
+    "downsize",
+    "slash"
+  ],
+  "begin": [
+    "launch",
+    "initiate",
+    "commence",
+    "inaugurate",
+    "embark",
+    "undertake"
+  ],
+  "end": [
+    "terminate",
+    "cease",
+    "conclude",
+    "finalize",
+    "discontinue",
+    "halt",
+    "suspend"
+  ],
+  "approve": [
+    "approve",
+    "authorize",
+    "endorse",
+    "ratify",
+    "sanction",
+    "consent"
+  ],
+  "reject": [
+    "reject",
+    "refuse",
+    "deny",
+    "turn down",
+    "disapprove",
+    "veto"
+  ],
+  "help": [
+    "assist",
+    "aid",
+    "support",
+    "facilitate"
+  ],
+  "check": [
+    "inspect",
+    "examine",
+    "review",
+    "verify",
+    "confirm",
+    "scrutinize",
+    "audit",
+    "investigate",
+    "monitor",
+    "assess",
+    "evaluate",
+    "appraise"
+  ],
+  "give": [
+    "provide",
+    "supply",
+    "furnish",
+    "offer",
+    "donate",
+    "grant",
+    "distribute",
+    "dispense",
+    "deliver"
+  ],
+  "get": [
+    "obtain",
+    "acquire",
+    "gain",
+    "attain",
+    "secure",
+    "procure",
+    "receive"
+  ],
+  "choose": [
+    "select",
+    "choose",
+    "nominate",
+    "designate",
+    "appoint",
+    "elect",
+    "opt"
+  ],
+  "important": [
+    "essential",
+    "vital",
+    "crucial",
+    "critical",
+    "indispensable",
+    "imperative",
+    "key",
+    "fundamental",
+    "primary",
+    "principal",
+    "major"
+  ],
+  "big": [
+    "considerable",
+    "substantial",
+    "significant",
+    "enormous",
+    "massive",
+    "immense",
+    "vast",
+    "tremendous",
+    "sizable"
+  ],
+  "small": [
+    "minor",
+    "slight",
+    "trivial",
+    "insignificant",
+    "negligible",
+    "minimal"
+  ],
+  "quick": [
+    "prompt",
+    "swift",
+    "rapid",
+    "immediate",
+    "instant",
+    "brisk"
+  ],
+  "immediately": [
+    "immediately",
+    "promptly",
+    "momentarily"
+  ],
+  "fix": [
+    "repair",
+    "restore",
+    "renovate",
+    "refurbish",
+    "revamp",
+    "overhaul",
+    "rehabilitate",
+    "remedy"
+  ],
+  "change": [
+    "alter",
+    "modify",
+    "adjust",
+    "revise",
+    "amend",
+    "adapt",
+    "convert",
+    "transform",
+    "switch"
+  ],
+  "say": [
+    "state",
+    "declare",
+    "announce",
+    "proclaim",
+    "express",
+    "mention",
+    "remark",
+    "assert",
+    "claim"
+  ],
+  "show": [
+    "display",
+    "exhibit",
+    "demonstrate",
+    "illustrate",
+    "reveal",
+    "indicate",
+    "present",
+    "showcase",
+    "depict",
+    "portray",
+    "unveil"
+  ],
+  "stop": [
+    "prevent",
+    "prohibit",
+    "forbid",
+    "ban",
+    "restrict",
+    "hinder",
+    "impede",
+    "obstruct",
+    "hamper",
+    "inhibit",
+    "curb"
+  ],
+  "keep": [
+    "maintain",
+    "retain",
+    "preserve",
+    "conserve",
+    "sustain",
+    "uphold"
+  ],
+  "pay": [
+    "reimburse",
+    "compensate",
+    "refund",
+    "repay",
+    "remit"
+  ],
+  "cost": [
+    "cost",
+    "expense",
+    "expenditure",
+    "outlay",
+    "fee",
+    "charge",
+    "fare",
+    "tariff",
+    "toll"
+  ],
+  "money": [
+    "income",
+    "earnings",
+    "revenue",
+    "salary",
+    "wage",
+    "payroll",
+    "remuneration"
+  ],
+  "rule": [
+    "regulation",
+    "policy",
+    "guideline",
+    "statute",
+    "protocol",
+    "directive",
+    "provision"
+  ],
+  "plan": [
+    "scheme",
+    "strategy",
+    "plan",
+    "blueprint",
+    "agenda",
+    "initiative"
+  ],
+  "goal": [
+    "objective",
+    "target",
+    "aim",
+    "purpose",
+    "mission"
+  ],
+  "worker": [
+    "employee",
+    "staff",
+    "personnel",
+    "workforce",
+    "associate",
+    "colleague"
+  ],
+  "boss": [
+    "supervisor",
+    "manager",
+    "executive",
+    "superintendent",
+    "chairman",
+    "chairperson",
+    "director"
+  ],
+  "customer": [
+    "customer",
+    "client",
+    "patron",
+    "consumer"
+  ],
+  "company": [
+    "firm",
+    "corporation",
+    "enterprise",
+    "company",
+    "subsidiary",
+    "affiliate"
+  ],
+  "problem": [
+    "issue",
+    "problem",
+    "difficulty",
+    "obstacle",
+    "hurdle",
+    "barrier",
+    "setback",
+    "glitch",
+    "drawback",
+    "flaw",
+    "defect"
+  ],
+  "agreement": [
+    "agreement",
+    "contract",
+    "consensus",
+    "deal",
+    "treaty",
+    "compromise"
+  ],
+  "cheap": [
+    "affordable",
+    "inexpensive",
+    "economical",
+    "reasonable",
+    "low-cost",
+    "cost-effective"
+  ],
+  "expensive": [
+    "lavish",
+    "luxurious",
+    "extravagant",
+    "premium"
+  ],
+  "famous": [
+    "renowned",
+    "prominent",
+    "eminent",
+    "prestigious",
+    "noted",
+    "notable",
+    "well-known",
+    "distinguished"
+  ],
+  "enough": [
+    "sufficient",
+    "adequate",
+    "ample",
+    "plentiful",
+    "abundant"
+  ],
+  "kind": [
+    "courteous",
+    "polite",
+    "generous",
+    "hospitable",
+    "considerate",
+    "cordial"
+  ],
+  "careful": [
+    "cautious",
+    "prudent",
+    "careful",
+    "thorough",
+    "meticulous",
+    "diligent",
+    "conscientious",
+    "discreet",
+    "wary"
+  ],
+  "happy": [
+    "thrilled",
+    "delighted",
+    "pleased",
+    "cheerful",
+    "enthusiastic",
+    "eager"
+  ],
+  "talk": [
+    "discuss",
+    "negotiate",
+    "consult",
+    "confer",
+    "debate",
+    "communicate"
+  ],
+  "meeting": [
+    "conference",
+    "meeting",
+    "seminar",
+    "symposium",
+    "workshop",
+    "convention",
+    "forum",
+    "summit",
+    "session"
+  ],
+  "gather": [
+    "collect",
+    "gather",
+    "assemble",
+    "accumulate",
+    "compile"
+  ],
+  "join": [
+    "combine",
+    "merge",
+    "unite",
+    "integrate",
+    "consolidate",
+    "incorporate",
+    "connect"
+  ],
+  "split": [
+    "separate",
+    "divide",
+    "split",
+    "detach",
+    "isolate",
+    "disassemble"
+  ],
+  "limit": [
+    "limit",
+    "restrict",
+    "confine",
+    "cap",
+    "restraint",
+    "constraint",
+    "restriction",
+    "limitation"
+  ],
+  "ask": [
+    "inquire",
+    "request",
+    "query",
+    "solicit",
+    "demand"
+  ],
+  "answer": [
+    "reply",
+    "respond",
+    "react"
+  ],
+  "tell": [
+    "inform",
+    "notify",
+    "advise",
+    "alert",
+    "apprise",
+    "remind"
+  ],
+  "persuade": [
+    "persuade",
+    "convince",
+    "encourage",
+    "motivate",
+    "urge",
+    "induce",
+    "inspire"
+  ],
+  "damage": [
+    "damage",
+    "harm",
+    "injure",
+    "impair",
+    "deteriorate",
+    "degrade"
+  ],
+  "future": [
+    "upcoming",
+    "forthcoming",
+    "impending",
+    "imminent"
+  ],
+  "past": [
+    "previous",
+    "former",
+    "prior",
+    "preceding"
+  ],
+  "main": [
+    "main",
+    "chief",
+    "primary",
+    "principal",
+    "prime",
+    "leading",
+    "dominant",
+    "foremost"
+  ],
+  "whole": [
+    "entire",
+    "complete",
+    "total",
+    "overall",
+    "comprehensive",
+    "extensive"
+  ],
+  "exact": [
+    "accurate",
+    "precise",
+    "exact",
+    "correct"
+  ],
+  "tough": [
+    "strict",
+    "rigid",
+    "rigorous",
+    "harsh",
+    "severe"
+  ],
+  "stable": [
+    "steady",
+    "stable",
+    "consistent",
+    "constant",
+    "continual",
+    "continuous",
+    "reliable",
+    "dependable"
+  ],
+  "ability": [
+    "ability",
+    "capability",
+    "competence",
+    "proficiency",
+    "expertise",
+    "skill",
+    "talent",
+    "aptitude",
+    "capacity"
+  ],
+  "skilled": [
+    "skilled",
+    "competent",
+    "proficient",
+    "capable",
+    "adept",
+    "qualified"
+  ],
+  "benefit": [
+    "benefit",
+    "advantage",
+    "merit",
+    "incentive",
+    "reward"
+  ],
+  "trip": [
+    "trip",
+    "journey",
+    "tour",
+    "excursion",
+    "voyage",
+    "expedition"
+  ],
+  "building": [
+    "facility",
+    "premises",
+    "establishment",
+    "institution"
+  ],
+  "store": [
+    "store",
+    "shop",
+    "boutique",
+    "retailer",
+    "outlet",
+    "supermarket",
+    "grocery",
+    "marketplace"
+  ],
+  "ensure": [
+    "ensure",
+    "guarantee",
+    "assure"
+  ],
+  "mandatory": [
+    "mandatory",
+    "compulsory",
+    "obligatory"
+  ],
+  "adv-fast": [
+    "quickly",
+    "rapidly",
+    "swiftly",
+    "speedily",
+    "promptly",
+    "immediately",
+    "instantly",
+    "hastily",
+    "hurriedly",
+    "briskly",
+    "shortly",
+    "momentarily"
+  ],
+  "adv-hugely": [
+    "enormously",
+    "immensely",
+    "vastly",
+    "tremendously",
+    "extremely",
+    "exceedingly",
+    "greatly",
+    "exceptionally",
+    "considerably",
+    "substantially",
+    "significantly"
+  ],
+  "adv-entirely": [
+    "completely",
+    "totally",
+    "wholly",
+    "utterly",
+    "entirely",
+    "fully",
+    "altogether",
+    "absolutely",
+    "wholeheartedly"
+  ],
+  "adv-mainly": [
+    "mainly",
+    "mostly",
+    "chiefly",
+    "principally",
+    "predominantly",
+    "primarily",
+    "largely",
+    "essentially",
+    "basically"
+  ],
+  "adv-clearly": [
+    "clearly",
+    "obviously",
+    "evidently",
+    "plainly",
+    "apparently",
+    "undeniably",
+    "decidedly",
+    "demonstrably",
+    "undoubtedly"
+  ],
+  "adv-carefully": [
+    "carefully",
+    "cautiously",
+    "attentively",
+    "thoughtfully",
+    "mindfully",
+    "diligently",
+    "meticulously",
+    "thoroughly",
+    "closely"
+  ],
+  "adv-firmly": [
+    "firmly",
+    "tightly",
+    "securely",
+    "solidly",
+    "steadfastly",
+    "resolutely",
+    "adamantly",
+    "decisively"
+  ],
+  "adv-honestly": [
+    "honestly",
+    "frankly",
+    "candidly",
+    "genuinely",
+    "truly",
+    "sincerely",
+    "openly",
+    "earnestly"
+  ],
+  "adv-sometimes": [
+    "occasionally",
+    "periodically",
+    "sometimes",
+    "intermittently"
+  ],
+  "adv-regularly": [
+    "regularly",
+    "routinely",
+    "habitually",
+    "customarily",
+    "ordinarily",
+    "usually",
+    "commonly",
+    "typically",
+    "traditionally",
+    "conventionally"
+  ],
+  "adv-gradually": [
+    "gradually",
+    "progressively",
+    "steadily",
+    "incrementally",
+    "slowly"
+  ],
+  "adv-suddenly": [
+    "abruptly",
+    "suddenly",
+    "unexpectedly"
+  ],
+  "adv-gladly": [
+    "gladly",
+    "willingly",
+    "happily",
+    "cheerfully",
+    "eagerly",
+    "readily",
+    "voluntarily"
+  ],
+  "adv-passion": [
+    "enthusiastically",
+    "passionately",
+    "ardently",
+    "keenly",
+    "energetically",
+    "vigorously",
+    "avidly"
+  ],
+  "adv-about": [
+    "approximately",
+    "roughly",
+    "nearly",
+    "almost"
+  ],
+  "adv-recent": [
+    "recently",
+    "lately"
+  ],
+  "adv-now": [
+    "currently",
+    "presently",
+    "nowadays"
+  ],
+  "adv-after": [
+    "afterward",
+    "afterwards",
+    "thereafter",
+    "subsequently",
+    "hereafter",
+    "henceforth",
+    "eventually",
+    "ultimately"
+  ],
+  "adv-so": [
+    "therefore",
+    "thus",
+    "hence",
+    "consequently",
+    "accordingly"
+  ],
+  "adv-but": [
+    "however",
+    "nevertheless",
+    "nonetheless",
+    "conversely",
+    "regardless"
+  ],
+  "adv-informal": [
+    "informally",
+    "unofficially",
+    "casually"
+  ],
+  "adv-formal": [
+    "officially",
+    "formally"
+  ],
+  "adv-perfect": [
+    "perfectly",
+    "flawlessly",
+    "impeccably",
+    "impressively"
+  ],
+  "adv-strong": [
+    "strongly",
+    "forcefully",
+    "intensely",
+    "heavily",
+    "vigorously",
+    "emphatically"
+  ],
+  "adv-easy": [
+    "easily",
+    "effortlessly",
+    "smoothly",
+    "seamlessly"
+  ],
+  "adv-wide": [
+    "widely",
+    "extensively",
+    "broadly",
+    "comprehensively",
+    "universally",
+    "globally",
+    "worldwide"
+  ],
+  "adv-public": [
+    "publicly",
+    "openly"
+  ],
+  "adv-special": [
+    "specially",
+    "specifically",
+    "particularly",
+    "notably",
+    "especially",
+    "exclusively",
+    "solely",
+    "purely"
+  ],
+  "adv-rare": [
+    "rarely",
+    "seldom",
+    "infrequently",
+    "hardly",
+    "barely",
+    "scarcely"
+  ],
+  "adv-first": [
+    "originally",
+    "initially",
+    "firstly",
+    "previously",
+    "formerly"
+  ],
+  "adv-surprise": [
+    "surprisingly",
+    "remarkably",
+    "amazingly",
+    "unusually"
+  ],
+  "adv-polite": [
+    "politely",
+    "courteously",
+    "respectfully",
+    "kindly",
+    "cordially",
+    "graciously"
+  ],
+  "adv-wrongly": [
+    "mistakenly",
+    "accidentally",
+    "inadvertently",
+    "incorrectly",
+    "inaccurately",
+    "unintentionally"
+  ],
+  "adv-on-purpose": [
+    "deliberately",
+    "intentionally",
+    "purposely",
+    "knowingly"
+  ],
+  "adv-possible": [
+    "possibly",
+    "probably",
+    "presumably",
+    "supposedly",
+    "reportedly",
+    "allegedly",
+    "arguably",
+    "conceivably",
+    "hopefully"
+  ],
+  "adv-fair": [
+    "fairly",
+    "rather",
+    "somewhat",
+    "relatively",
+    "comparatively",
+    "moderately",
+    "reasonably",
+    "quite",
+    "pretty"
+  ],
+  "adv-yearly": [
+    "annually",
+    "yearly"
+  ],
+  "adv-self": [
+    "independently",
+    "individually",
+    "separately",
+    "personally"
+  ],
+  "adv-together": [
+    "jointly",
+    "mutually",
+    "collectively",
+    "collaboratively",
+    "cooperatively",
+    "concurrently",
+    "simultaneously",
+    "together"
+  ]
 }
