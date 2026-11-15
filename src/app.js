@@ -5,7 +5,7 @@ import {
 import { buildChoices } from './choices.js';
 
 const $ = (id) => document.getElementById(id);
-const POS_LABEL = { n: '명사', v: '동사', adj: '형용사', adv: '부사', prep: '전치사', conj: '접속사' };
+const POS_LABEL = { n: '명사', v: '동사', adj: '형용사', adv: '부사', prep: '전치사', conj: '접속사', phr: '구문' };
 
 let words = [];
 let byId = new Map();

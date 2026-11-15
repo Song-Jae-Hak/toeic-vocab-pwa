@@ -82,3 +82,9 @@ test('ids may have gaps but must be unique positive integers', () => {
   w[1].id = 0;
   assert.ok(validateWords(w).some((p) => /id/i.test(p)));
 });
+
+test('"phr" (phrase/collocation) is an accepted part of speech', () => {
+  const w = good();
+  w[2].pos = 'phr';
+  assert.deepEqual(validateWords(w), []);
+});

@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
-const POS = new Set(['n', 'v', 'adj', 'adv', 'prep', 'conj']);
+const POS = new Set(['n', 'v', 'adj', 'adv', 'prep', 'conj', 'phr']);
 
 export function validateWords(words, { idCheck = true } = {}) {
   const problems = [];
