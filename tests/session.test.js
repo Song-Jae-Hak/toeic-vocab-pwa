@@ -255,3 +255,62 @@ test('pruneSession keeps already answered ids even if their word was removed (hi
   assert.equal(out.session.ids.includes(id), true);
   assert.equal(out.session.answers[id].correct, true);
 });
+
+import { setHideMastered } from '../src/session.js';
+
+// Marks every id in `ids` as answered right 5 times.
+function mastered(st, ids) {
+  const w = { ...st.stats.words };
+  for (const id of ids) w[id] = { right: 5, wrong: 0 };
+  return { ...st, stats: { ...st.stats, words: w } };
+}
+
+test('with hideMastered on, a new session leaves out words answered right 5+ times', () => {
+  let st = mastered(emptyState(), Array.from({ length: 990 }, (_, i) => i + 1));
+  st = { ...st, settings: { ...st.settings, hideMastered: true } };
+  const s = ensureTodaySession(st, words(1000), day1, lcg(1)).session;
+  assert.deepEqual([...s.ids].sort((a, b) => a - b), Array.from({ length: 10 }, (_, i) => 991 + i));
+});
+
+test('with hideMastered off, mastered words are still asked', () => {
+  const st = mastered(emptyState(), Array.from({ length: 1000 }, (_, i) => i + 1));
+  assert.equal(ensureTodaySession(st, words(1000), day1, lcg(1)).session.ids.length, 300);
+});
+
+test('turning hideMastered on mid-day swaps unanswered mastered words for others, keeping answered ones', () => {
+  const st0 = withAnswers(10);
+  const answered = st0.session.ids.slice(0, 10);
+  const unansweredMastered = st0.session.ids.slice(10, 60);
+  const st = mastered(st0, [...answered, ...unansweredMastered]);
+  const out = setHideMastered(st, words(1000), true, lcg(8));
+  assert.equal(out.settings.hideMastered, true);
+  assert.equal(out.session.ids.length, 300);
+  assert.equal(new Set(out.session.ids).size, 300);
+  assert.deepEqual(out.session.ids.slice(0, 10), answered);
+  for (const id of unansweredMastered) assert.ok(!out.session.ids.includes(id));
+  assert.equal(currentIndex(out.session), 10);
+});
+
+test('turning hideMastered off keeps today\'s questions as they are', () => {
+  const st = { ...withAnswers(10), settings: { ...withAnswers(10).settings, hideMastered: true } };
+  const out = setHideMastered(st, words(1000), false, lcg(9));
+  assert.equal(out.settings.hideMastered, false);
+  assert.deepEqual(out.session.ids, st.session.ids);
+});
+
+test('setHideMastered ignores values that are not booleans', () => {
+  const st = withAnswers(5);
+  assert.deepEqual(setHideMastered(st, words(1000), 'yes', lcg(10)), st);
+});
+
+test('setDailyCount tops up only with unmastered words when hideMastered is on', () => {
+  let st = withAnswers(10);
+  const taken = new Set(st.session.ids);
+  const free = words(1000).map((w) => w.id).filter((id) => !taken.has(id));
+  st = mastered(st, free.slice(0, 650));
+  st = { ...st, settings: { ...st.settings, hideMastered: true } };
+  const out = setDailyCount(st, words(1000), 500, lcg(11));
+  const added = out.session.ids.slice(300);
+  assert.equal(added.length, 50);
+  assert.deepEqual([...added].sort((a, b) => a - b), free.slice(650));
+});

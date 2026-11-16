@@ -1,10 +1,11 @@
 import { loadState, saveState, exportState, importState } from './storage.js';
 import {
-  ensureTodaySession, currentIndex, recordAnswer, progress, shouldStartNewSession, setDailyCount, pruneSession, DAILY_COUNT_OPTIONS, UNKNOWN_INDEX,
+  ensureTodaySession, currentIndex, recordAnswer, progress, shouldStartNewSession, setDailyCount, setHideMastered, pruneSession,
+  DAILY_COUNT_OPTIONS, UNKNOWN_INDEX,
 } from './session.js';
 import { buildChoices } from './choices.js';
 import { withSetting } from './settings.js';
-import { summary, topWrong } from './stats.js';
+import { summary, topWrong, isMastered, MASTERED_RIGHT } from './stats.js';
 import { AUDIO_CACHE, loadAudioBlob, parseManifest } from './audio.js';
 import { todayString } from './session.js';
 
@@ -197,7 +198,7 @@ function showFeedback(word, correct, unknown) {
 }
 
 function setMenuMessage(text) {
-  $('menu-msg').textContent = text;
+  $('settings-msg').textContent = text;
 }
 
 function segmented(boxId, options, current, onPick) {
@@ -239,6 +240,16 @@ function renderSettings() {
   };
   segmented('auto-options', [{ value: false, label: '끄기' }, { value: true, label: '켜기' }], s.autoNext, change('autoNext'));
   segmented('play-options', [{ value: false, label: '끄기' }, { value: true, label: '켜기' }], s.autoPlay, change('autoPlay'));
+  segmented('mastered-options', [{ value: false, label: '계속 내기' }, { value: true, label: '그만 내기' }], s.hideMastered, (on) => {
+    state = setHideMastered(state, words, on, Math.random);
+    persist();
+    renderSettings();
+    renderQuestion();
+    const n = words.filter((w) => isMastered(state.stats, w.id)).length;
+    $('settings-msg').textContent = on
+      ? `${MASTERED_RIGHT}번 이상 맞힌 단어 ${n}개를 앞으로 내지 않습니다. 오늘 이미 푼 문제는 그대로입니다.`
+      : `${MASTERED_RIGHT}번 이상 맞힌 단어도 다시 나옵니다.`;
+  });
   segmented('font-options', [{ value: 'small', label: '작게' }, { value: 'normal', label: '보통' }, { value: 'large', label: '크게' }, { value: 'xlarge', label: '아주 크게' }], s.fontSize, change('fontSize'));
   segmented('theme-options', [{ value: 'system', label: '기기 설정' }, { value: 'light', label: '밝게' }, { value: 'dark', label: '어둡게' }], s.theme, change('theme'));
 }

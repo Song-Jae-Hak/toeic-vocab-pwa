@@ -36,3 +36,9 @@ test('font sizes run from small to xlarge, with normal still the default', () =>
   assert.equal(DEFAULT_SETTINGS.fontSize, 'normal');
   assert.equal(withSetting(base, 'fontSize', 'small').settings.fontSize, 'small');
 });
+
+test('hideMastered is a boolean setting that defaults to off', () => {
+  assert.equal(DEFAULT_SETTINGS.hideMastered, false);
+  assert.equal(withSetting(base, 'hideMastered', true).settings.hideMastered, true);
+  assert.equal(withSetting(base, 'hideMastered', 'yes').settings.hideMastered, false);
+});
