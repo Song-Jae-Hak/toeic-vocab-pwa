@@ -90,3 +90,14 @@ export function setDailyCount(state, words, count, rng) {
   }
   return { ...state, settings, session: { ...session, ids } };
 }
+
+// After the word list changes: remove not-yet-answered words that no longer exist from today's session.
+// Answered ones stay so today's progress and history remain consistent.
+export function pruneSession(state, words) {
+  const session = state.session;
+  if (!session) return state;
+  const valid = new Set(words.map((w) => w.id));
+  const ids = session.ids.filter((id) => valid.has(id) || id in session.answers);
+  if (ids.length === session.ids.length) return state;
+  return { ...state, session: { ...session, ids } };
+}

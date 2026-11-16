@@ -217,3 +217,41 @@ test('모르겠다 counts as wrong in the stats', () => {
   const r = recordAnswer(a, id, UNKNOWN_INDEX, true);
   assert.deepEqual(r.stats.words[id], { right: 0, wrong: 1 });
 });
+
+import { pruneSession } from '../src/session.js';
+
+test('pruneSession drops words that no longer exist from today\'s session and keeps the rest in order', () => {
+  const a = ensureTodaySession(emptyState(), words(1000), day1, lcg(1));
+  const gone = a.session.ids[5];
+  const kept = words(1000).filter((w) => w.id !== gone);
+  const out = pruneSession(a, kept);
+  assert.equal(out.session.ids.length, 299);
+  assert.deepEqual(out.session.ids, a.session.ids.filter((id) => id !== gone));
+  assert.deepEqual(out.weights, a.weights);
+});
+
+test('pruneSession does not count a removed word as wrong or change any weight', () => {
+  let a = ensureTodaySession(emptyState(), words(1000), day1, lcg(1));
+  a = recordAnswer(a, a.session.ids[0], 0, true);
+  const gone = a.session.ids[3];
+  const out = pruneSession(a, words(1000).filter((w) => w.id !== gone));
+  assert.deepEqual(progress(out.session), { done: 1, total: 299, correct: 1, wrong: 0 });
+  assert.equal(out.weights[gone], undefined);
+  assert.equal(out.stats.words[gone], undefined);
+});
+
+test('pruneSession leaves an untouched state alone and handles a missing session', () => {
+  const a = ensureTodaySession(emptyState(), words(1000), day1, lcg(1));
+  assert.equal(pruneSession(a, words(1000)), a);
+  const empty = emptyState();
+  assert.equal(pruneSession(empty, words(10)), empty);
+});
+
+test('pruneSession keeps already answered ids even if their word was removed (history stays consistent)', () => {
+  let a = ensureTodaySession(emptyState(), words(1000), day1, lcg(1));
+  const id = a.session.ids[0];
+  a = recordAnswer(a, id, 0, true);
+  const out = pruneSession(a, words(1000).filter((w) => w.id !== id));
+  assert.equal(out.session.ids.includes(id), true);
+  assert.equal(out.session.answers[id].correct, true);
+});

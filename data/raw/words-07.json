@@ -20,7 +20,7 @@
 {"en":"technician","pos":"n","ko":"기술자"},
 {"en":"technique","pos":"n","ko":"기법"},
 {"en":"technology","pos":"n","ko":"기술"},
-{"en":"telecommunications","pos":"n","ko":"통신"},
+{"en":"telecommunications","pos":"n","ko":"통신","ko2":"원격 통신"},
 {"en":"temperature","pos":"n","ko":"온도"},
 {"en":"template","pos":"n","ko":"견본","ko2":"서식"},
 {"en":"temporarily","pos":"adv","ko":"임시로"},

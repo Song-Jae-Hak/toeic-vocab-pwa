@@ -1,6 +1,6 @@
 import { loadState, saveState, exportState, importState } from './storage.js';
 import {
-  ensureTodaySession, currentIndex, recordAnswer, progress, shouldStartNewSession, setDailyCount, DAILY_COUNT_OPTIONS, UNKNOWN_INDEX,
+  ensureTodaySession, currentIndex, recordAnswer, progress, shouldStartNewSession, setDailyCount, pruneSession, DAILY_COUNT_OPTIONS, UNKNOWN_INDEX,
 } from './session.js';
 import { buildChoices } from './choices.js';
 import { withSetting } from './settings.js';
@@ -368,7 +368,7 @@ async function start() {
   }
   byId = new Map(words.map((w) => [w.id, w]));
   await loadAudioManifest();
-  state = ensureTodaySession(loadState(safeStore()), words, new Date(), Math.random);
+  state = pruneSession(ensureTodaySession(loadState(safeStore()), words, new Date(), Math.random), words);
   persist();
   applyAppearance();
   renderSettings();
