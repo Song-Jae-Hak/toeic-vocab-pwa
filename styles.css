@@ -221,3 +221,16 @@ h2 { font-size: 18px; margin-top: 24px; }
   .speak { margin-top: 8px; min-height: 40px; }
   .next { min-height: 48px; }
 }
+
+.pager { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 12px 0 8px; }
+.pager button {
+  min-height: 44px;
+  padding: 0 16px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--text);
+  font-size: 15px;
+}
+.pager button:disabled { opacity: 0.4; }
+.pager-label { color: var(--muted); font-size: 14px; font-variant-numeric: tabular-nums; text-align: center; flex: 1; }

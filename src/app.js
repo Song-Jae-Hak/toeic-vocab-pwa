@@ -6,6 +6,7 @@ import {
 import { buildChoices } from './choices.js';
 import { withSetting } from './settings.js';
 import { summary, topWrong, isMastered, MASTERED_RIGHT } from './stats.js';
+import { paginate } from './paginate.js';
 import { AUDIO_CACHE, loadAudioBlob, parseManifest } from './audio.js';
 import { todayString } from './session.js';
 
@@ -87,24 +88,55 @@ function renderProgress() {
   $('progress').textContent = `오늘 ${p.done} / ${p.total}  ·  ✔ ${p.correct}  ✘ ${p.wrong}`;
 }
 
+// Shows one page (25 rows) of a list with previous/next buttons; the whole list stays reachable.
+function showPaged(listId, pagerId, rows, page, makeRow, scrollToTop) {
+  const list = $(listId);
+  const pager = $(pagerId);
+  const p = paginate(rows, page);
+  list.textContent = '';
+  p.items.forEach((row, i) => list.append(makeRow(row, p.start + i)));
+  pager.textContent = '';
+  pager.hidden = p.pageCount <= 1;
+  if (p.pageCount <= 1) return;
+  const go = (n) => () => {
+    showPaged(listId, pagerId, rows, n, makeRow, true);
+  };
+  const prev = document.createElement('button');
+  prev.type = 'button';
+  prev.textContent = '‹ 이전';
+  prev.disabled = p.page <= 1;
+  prev.addEventListener('click', go(p.page - 1));
+  const label = document.createElement('span');
+  label.className = 'pager-label';
+  label.textContent = `${p.page} / ${p.pageCount}  (${p.total}개)`;
+  const next = document.createElement('button');
+  next.type = 'button';
+  next.textContent = '다음 ›';
+  next.disabled = p.page >= p.pageCount;
+  next.addEventListener('click', go(p.page + 1));
+  pager.append(prev, label, next);
+  if (scrollToTop) list.scrollIntoView({ block: 'start' });
+}
+
 function renderDone() {
   const p = progress(state.session);
   $('done-summary').textContent = `${p.total}문제 중 ${p.correct}개 정답, ${p.wrong}개 오답`;
-  const list = $('done-wrong');
   $('done-hint').textContent = `내일 새 ${state.settings.dailyCount}문제가 열립니다.`;
-  list.textContent = '';
-  const wrongIds = state.session.ids.filter((id) => state.session.answers[id] && !state.session.answers[id].correct);
+  const wrongIds = state.session.ids.filter((id) => state.session.answers[id] && !state.session.answers[id].correct).filter((id) => byId.has(id));
   if (wrongIds.length === 0) {
+    const list = $('done-wrong');
+    list.textContent = '';
+    $('done-pager').hidden = true;
     const li = document.createElement('li');
     li.textContent = '틀린 단어가 없어요!';
     list.append(li);
-  }
-  for (const id of wrongIds.slice(0, 30)) {
-    const w = byId.get(id);
-    if (!w) continue;
-    const li = document.createElement('li');
-    li.textContent = `${w.en} — ${w.ko}`;
-    list.append(li);
+  } else {
+    showPaged('done-wrong', 'done-pager', wrongIds, 1, (id, rank) => {
+      const w = byId.get(id);
+      const li = document.createElement('li');
+      li.textContent = `${rank}. ${w.en} — ${w.ko}`;
+      return li;
+    });
   }
   show('done');
 }
@@ -272,23 +304,25 @@ function renderStats() {
     box.append(dt, dd);
     grid.append(box);
   }
-  const list = $('stats-wrong');
-  list.textContent = '';
-  const wrong = topWrong(state.stats, 30).filter((w) => byId.has(w.id));
+  const wrong = topWrong(state.stats, Infinity).filter((w) => byId.has(w.id));
   if (wrong.length === 0) {
+    const list = $('stats-wrong');
+    list.textContent = '';
+    $('stats-pager').hidden = true;
     const li = document.createElement('li');
     li.textContent = '아직 틀린 단어가 없어요.';
     list.append(li);
-  }
-  for (const w of wrong) {
-    const word = byId.get(w.id);
-    const li = document.createElement('li');
-    li.textContent = `${word.en} — ${word.ko}`;
-    const meta = document.createElement('span');
-    meta.className = 'meta';
-    meta.textContent = `틀림 ${w.wrong} · 맞음 ${w.right}`;
-    li.append(meta);
-    list.append(li);
+  } else {
+    showPaged('stats-wrong', 'stats-pager', wrong, 1, (w, rank) => {
+      const word = byId.get(w.id);
+      const li = document.createElement('li');
+      li.textContent = `${rank}. ${word.en} — ${word.ko}`;
+      const meta = document.createElement('span');
+      meta.className = 'meta';
+      meta.textContent = `틀림 ${w.wrong} · 맞음 ${w.right}`;
+      li.append(meta);
+      return li;
+    });
   }
   show('stats');
   window.scrollTo(0, 0);

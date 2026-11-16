@@ -11,6 +11,7 @@ const ASSETS = [
   'src/audio.js',
   'src/choices.js',
   'src/sampler.js',
+  'src/paginate.js',
   'src/session.js',
   'src/settings.js',
   'src/stats.js',
