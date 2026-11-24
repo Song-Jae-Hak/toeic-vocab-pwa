@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { buildChoices } from '../src/choices.js';
+import { buildChoices, meaningLabel } from '../src/choices.js';
 
 function lcg(seed) {
   let s = seed >>> 0;
@@ -28,7 +28,39 @@ test('builds 4 distinct options with the answer at answerIndex', () => {
   const { options, answerIndex } = buildChoices(w, words, lcg(1));
   assert.equal(options.length, 4);
   assert.equal(new Set(options).size, 4);
-  assert.equal(options[answerIndex], w.ko);
+  assert.equal(options[answerIndex], '제출하다, 복종하다');
+  assert.equal(options[answerIndex], meaningLabel(w));
+});
+
+test('a two-meaning answer gets two-meaning distractors when there are enough', () => {
+  const ws = [
+    { id: 1, en: 'attend', pos: 'v', ko: '참석하다', ko2: '처리하다' },
+    { id: 2, en: 'a', pos: 'v', ko: '가', ko2: '가2' },
+    { id: 3, en: 'b', pos: 'v', ko: '나', ko2: '나2' },
+    { id: 4, en: 'c', pos: 'adj', ko: '다', ko2: '다2' },
+    { id: 5, en: 'd', pos: 'v', ko: '라' },
+    { id: 6, en: 'e', pos: 'v', ko: '마' },
+    { id: 7, en: 'f', pos: 'v', ko: '바' },
+  ];
+  for (let seed = 1; seed <= 30; seed++) {
+    const { options } = buildChoices(ws[0], ws, lcg(seed));
+    assert.ok(options.every((o) => o.includes(', ')), `seed ${seed}: ${options}`);
+  }
+});
+
+test('a one-meaning answer gets one-meaning distractors when there are enough', () => {
+  for (let seed = 1; seed <= 30; seed++) {
+    const { options } = buildChoices(words[5], words, lcg(seed));
+    assert.ok(options.every((o) => !o.includes(', ')), `seed ${seed}: ${options}`);
+  }
+});
+
+test('a word whose second meaning equals the answer is never a distractor', () => {
+  const ws = [...words, { id: 11, en: 'deny', pos: 'v', ko: '부인하다', ko2: '거절하다' }];
+  for (let seed = 1; seed <= 50; seed++) {
+    const { options } = buildChoices(ws[4], ws, lcg(seed));
+    assert.ok(!options.includes('부인하다, 거절하다'), `seed ${seed}: ${options}`);
+  }
 });
 
 test('never uses a same-group word as a distractor', () => {
@@ -41,8 +73,8 @@ test('never uses a same-group word as a distractor', () => {
 test('never uses a distractor equal to the answer string', () => {
   for (let seed = 1; seed <= 50; seed++) {
     const { options, answerIndex } = buildChoices(words[0], words, lcg(seed));
-    assert.equal(options.filter((o) => o === '증가하다').length, 1);
-    assert.equal(options[answerIndex], '증가하다');
+    assert.equal(options.filter((o) => o.startsWith('증가하다')).length, 1);
+    assert.equal(options[answerIndex], '증가하다, 늘리다');
   }
 });
 
@@ -55,7 +87,7 @@ test('never uses ko2 as a distractor', () => {
 });
 
 test('prefers same part of speech when enough candidates exist', () => {
-  const verbKo = new Set(words.filter((x) => x.pos === 'v').map((x) => x.ko));
+  const verbKo = new Set(words.filter((x) => x.pos === 'v').map(meaningLabel));
   for (let seed = 1; seed <= 50; seed++) {
     const { options } = buildChoices(words[4], words, lcg(seed));
     assert.ok(options.every((o) => verbKo.has(o)), `seed ${seed}: ${options}`);

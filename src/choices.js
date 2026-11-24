@@ -7,15 +7,27 @@ function shuffle(arr, rng) {
   return a;
 }
 
-function uniqueKo(candidates, seen) {
+// What an option shows: the main meaning, plus the second one when the word has it.
+export function meaningLabel(w) {
+  return w.ko2 ? `${w.ko}, ${w.ko2}` : w.ko;
+}
+
+// Distractor labels, skipping any whose main meaning was already used.
+function uniqueLabels(candidates, seen) {
   const out = [];
   for (const c of candidates) {
     if (!seen.has(c.ko)) {
       seen.add(c.ko);
-      out.push(c.ko);
+      out.push(meaningLabel(c));
     }
   }
   return out;
+}
+
+// True if the two words share any meaning, so one cannot be a wrong option for the other.
+function shareMeaning(a, b) {
+  const mine = new Set([a.ko, a.ko2].filter(Boolean));
+  return mine.has(b.ko) || (b.ko2 !== undefined && mine.has(b.ko2));
 }
 
 function groupTokens(w) {
@@ -29,17 +41,22 @@ function shareGroup(a, b) {
 
 export function buildChoices(word, allWords, rng) {
   const eligible = allWords.filter(
-    (w) => w.id !== word.id && w.ko !== word.ko && w.ko !== word.ko2 && !shareGroup(word, w),
+    (w) => w.id !== word.id && !shareMeaning(word, w) && !shareGroup(word, w),
   );
-  const samePos = shuffle(eligible.filter((w) => w.pos === word.pos), rng);
-  const otherPos = shuffle(eligible.filter((w) => w.pos !== word.pos), rng);
+  // Prefer distractors shaped like the answer (one meaning or two) so the comma gives nothing away,
+  // then the same part of speech.
+  const sameShape = (w) => Boolean(w.ko2) === Boolean(word.ko2);
+  const pick = (pos, shape) => shuffle(eligible.filter((w) => (w.pos === word.pos) === pos && sameShape(w) === shape), rng);
 
   const seen = new Set([word.ko]);
   const distractors = [
-    ...uniqueKo(samePos, seen),
-    ...uniqueKo(otherPos, seen),
+    ...uniqueLabels(pick(true, true), seen),
+    ...uniqueLabels(pick(false, true), seen),
+    ...uniqueLabels(pick(true, false), seen),
+    ...uniqueLabels(pick(false, false), seen),
   ].slice(0, 3);
 
-  const options = shuffle([word.ko, ...distractors], rng);
-  return { options, answerIndex: options.indexOf(word.ko) };
+  const answer = meaningLabel(word);
+  const options = shuffle([answer, ...distractors], rng);
+  return { options, answerIndex: options.indexOf(answer) };
 }

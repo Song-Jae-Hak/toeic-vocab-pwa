@@ -9,6 +9,7 @@ const ASSETS = [
   'data/words.json',
   'src/app.js',
   'src/audio.js',
+  'src/bundles.js',
   'src/choices.js',
   'src/sampler.js',
   'src/paginate.js',

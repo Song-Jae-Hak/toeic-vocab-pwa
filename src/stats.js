@@ -1,9 +1,9 @@
 // Long-term learning stats: per word right/wrong counts and per day answered counts.
-// A word answered right this many times in total counts as learned.
-export const MASTERED_RIGHT = 5;
+// A word answered right this many times in a row counts as learned; one wrong answer resets the run.
+export const MASTERED_STREAK = 3;
 
 export function isMastered(stats, id) {
-  return (stats?.words?.[id]?.right ?? 0) >= MASTERED_RIGHT;
+  return (stats?.words?.[id]?.streak ?? 0) >= MASTERED_STREAK;
 }
 
 export function emptyStats() {
@@ -11,10 +11,14 @@ export function emptyStats() {
 }
 
 export function recordStat(stats, id, correct, date) {
-  const w = stats.words[id] ?? { right: 0, wrong: 0 };
+  const w = stats.words[id] ?? { right: 0, wrong: 0, streak: 0 };
   const d = stats.days[date] ?? { n: 0, right: 0 };
   return {
-    words: { ...stats.words, [id]: { right: w.right + (correct ? 1 : 0), wrong: w.wrong + (correct ? 0 : 1) } },
+    words: { ...stats.words, [id]: {
+      right: w.right + (correct ? 1 : 0),
+      wrong: w.wrong + (correct ? 0 : 1),
+      streak: correct ? (w.streak ?? 0) + 1 : 0,
+    } },
     days: { ...stats.days, [date]: { n: d.n + 1, right: d.right + (correct ? 1 : 0) } },
   };
 }

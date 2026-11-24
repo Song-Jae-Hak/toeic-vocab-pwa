@@ -59,7 +59,7 @@
 {"en":"cinema","pos":"n","ko":"영화관"},
 {"en":"closet","pos":"n","ko":"벽장"},
 {"en":"code","pos":"n","ko":"암호","ko2":"규정"},
-{"en":"command","pos":"n","ko":"명령"},
+{"en":"command","pos":"n","ko":"명령","ko2":"(언어) 구사 능력"},
 {"en":"concert","pos":"n","ko":"콘서트"},
 {"en":"correctly","pos":"adv","ko":"올바르게"},
 {"en":"court","pos":"n","ko":"법원","ko2":"경기장"},
