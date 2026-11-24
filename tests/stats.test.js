@@ -11,8 +11,8 @@ test('recordStat counts per word and per day without mutating the input', () => 
   const s1 = recordStat(s0, 7, true, '2026-11-15');
   const s2 = recordStat(s1, 7, false, '2026-11-15');
   const s3 = recordStat(s2, 9, false, '2026-11-16');
-  assert.deepEqual(s3.words[7], { right: 1, wrong: 1 });
-  assert.deepEqual(s3.words[9], { right: 0, wrong: 1 });
+  assert.deepEqual(s3.words[7], { right: 1, wrong: 1, streak: 0 });
+  assert.deepEqual(s3.words[9], { right: 0, wrong: 1, streak: 0 });
   assert.deepEqual(s3.days['2026-11-15'], { n: 2, right: 1 });
   assert.deepEqual(s3.days['2026-11-16'], { n: 1, right: 0 });
   assert.deepEqual(s0, { words: {}, days: {} });
@@ -70,14 +70,22 @@ test('topWrong breaks ties on wrong count by lower accuracy', () => {
   assert.deepEqual(topWrong(s, 5).map((w) => w.id), [2, 1]);
 });
 
-import { isMastered, MASTERED_RIGHT } from '../src/stats.js';
+import { isMastered, MASTERED_STREAK } from '../src/stats.js';
 
-test('a word is mastered once it has been answered right 5 times, wrong answers aside', () => {
-  assert.equal(MASTERED_RIGHT, 5);
-  const stats = { words: { 1: { right: 4, wrong: 0 }, 2: { right: 5, wrong: 7 }, 3: { right: 9, wrong: 0 } }, days: {} };
+test('a word is learned once it has been answered right 3 times in a row', () => {
+  assert.equal(MASTERED_STREAK, 3);
+  const stats = { words: { 1: { right: 9, wrong: 1, streak: 2 }, 2: { right: 3, wrong: 7, streak: 3 }, 3: { right: 9, wrong: 0 } }, days: {} };
   assert.equal(isMastered(stats, 1), false);
   assert.equal(isMastered(stats, 2), true);
-  assert.equal(isMastered(stats, 3), true);
+  assert.equal(isMastered(stats, 3), false); // older records without a streak start over
   assert.equal(isMastered(stats, 4), false);
   assert.equal(isMastered(undefined, 1), false);
+});
+
+test('a wrong answer resets the streak, right answers build it up', () => {
+  let s = emptyStats();
+  for (const ok of [true, true, false, true, true, true]) s = recordStat(s, 1, ok, '2026-11-15');
+  assert.deepEqual(s.words[1], { right: 5, wrong: 1, streak: 3 });
+  assert.equal(isMastered(s, 1), true);
+  assert.equal(isMastered(recordStat(s, 1, false, '2026-11-16'), 1), false);
 });

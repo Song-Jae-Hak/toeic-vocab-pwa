@@ -140,7 +140,7 @@
 {"en":"structure","pos":"n","ko":"구조"},
 {"en":"struggle","pos":"v","ko":"고군분투하다"},
 {"en":"subject","pos":"n","ko":"주제","ko2":"과목"},
-{"en":"subject to","pos":"adj","ko":"~의 영향을 받기 쉬운"},
+{"en":"subject to","pos":"adj","ko":"~의 영향을 받기 쉬운","ko2":"~을 조건으로 하는"},
 {"en":"submission","pos":"n","ko":"제출"},
 {"en":"subordinate","pos":"n","ko":"부하"},
 {"en":"subscriber","pos":"n","ko":"구독자"},

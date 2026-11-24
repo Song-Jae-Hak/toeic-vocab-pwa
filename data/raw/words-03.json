@@ -170,7 +170,7 @@
 {"en":"deed","pos":"n","ko":"증서","ko2":"행위"},
 {"en":"defective","pos":"adj","ko":"결함이 있는"},
 {"en":"deficiency","pos":"n","ko":"결핍"},
-{"en":"deliberately","pos":"adv","ko":"고의로"},
+{"en":"deliberately","pos":"adv","ko":"고의로","ko2":"신중하게"},
 {"en":"delinquent","pos":"adj","ko":"연체된"},
 {"en":"demonstration","pos":"n","ko":"시연","ko2":"시위"},
 {"en":"departmental","pos":"adj","ko":"부서의"},

@@ -1,11 +1,12 @@
 import { loadState, saveState, exportState, importState } from './storage.js';
 import {
-  ensureTodaySession, currentIndex, recordAnswer, progress, shouldStartNewSession, setDailyCount, setHideMastered, pruneSession,
+  ensureTodaySession, currentIndex, recordAnswer, progress, shouldStartNewSession, setDailyCount, setHideMastered, setBundle, pruneSession,
   DAILY_COUNT_OPTIONS, UNKNOWN_INDEX,
 } from './session.js';
-import { buildChoices } from './choices.js';
+import { buildChoices, meaningLabel } from './choices.js';
 import { withSetting } from './settings.js';
-import { summary, topWrong, isMastered, MASTERED_RIGHT } from './stats.js';
+import { summary, topWrong, isMastered, MASTERED_STREAK } from './stats.js';
+import { bundleCount, bundleProgress, currentBundle, UNLOCK_RATIO } from './bundles.js';
 import { paginate } from './paginate.js';
 import { AUDIO_CACHE, loadAudioBlob, parseManifest } from './audio.js';
 import { todayString } from './session.js';
@@ -118,9 +119,35 @@ function showPaged(listId, pagerId, rows, page, makeRow, scrollToTop) {
   if (scrollToTop) list.scrollIntoView({ block: 'start' });
 }
 
+function bundleLine(b) {
+  const bp = bundleProgress(state, words, b);
+  return `${b + 1}묶음 외운 단어 ${bp.mastered} / ${bp.total} (${Math.floor(bp.ratio * 100)}%)`;
+}
+
+// Move on to the next bundle; today's answered questions stay, the rest come from the new bundle.
+function goToBundle(b) {
+  state = setBundle(state, words, b, Math.random);
+  persist();
+  renderSettings();
+  renderQuestion();
+}
+
+function renderBundleOffer() {
+  const b = currentBundle(state, words);
+  const bp = bundleProgress(state, words, b);
+  $('done-bundle').textContent = bp.canAdvance
+    ? `${bundleLine(b)} — 다음 묶음으로 넘어갈 수 있어요! 못 외운 단어는 함께 가져갑니다.`
+    : `${bundleLine(b)} · ${Math.round(UNLOCK_RATIO * 100)}%를 외우면 다음 묶음이 열려요.`;
+  const btn = $('done-next-bundle');
+  btn.hidden = !bp.canAdvance;
+  btn.textContent = `${b + 2}묶음 시작하기 ›`;
+  btn.onclick = () => goToBundle(b + 1);
+}
+
 function renderDone() {
   const p = progress(state.session);
   $('done-summary').textContent = `${p.total}문제 중 ${p.correct}개 정답, ${p.wrong}개 오답`;
+  renderBundleOffer();
   $('done-hint').textContent = `내일 새 ${state.settings.dailyCount}문제가 열립니다.`;
   const wrongIds = state.session.ids.filter((id) => state.session.answers[id] && !state.session.answers[id].correct).filter((id) => byId.has(id));
   if (wrongIds.length === 0) {
@@ -134,7 +161,7 @@ function renderDone() {
     showPaged('done-wrong', 'done-pager', wrongIds, 1, (id, rank) => {
       const w = byId.get(id);
       const li = document.createElement('li');
-      li.textContent = `${rank}. ${w.en} — ${w.ko}`;
+      li.textContent = `${rank}. ${w.en} — ${meaningLabel(w)}`;
       return li;
     });
   }
@@ -224,8 +251,9 @@ function makeOption(label, text, index, unknown) {
 }
 
 function showFeedback(word, correct, unknown) {
-  $('feedback-text').textContent = correct ? '정답!' : unknown ? `정답: ${word.ko}` : `오답 — 정답: ${word.ko}`;
-  $('feedback-extra').textContent = word.ko2 ? `다른 뜻: ${word.ko2}` : '';
+  // Both meanings are already on the answer option, so feedback only says right or wrong.
+  $('feedback-text').textContent = correct ? '정답!' : unknown ? `정답: ${meaningLabel(word)}` : `오답 — 정답: ${meaningLabel(word)}`;
+  $('feedback-extra').textContent = '';
   $('feedback').hidden = false;
 }
 
@@ -263,6 +291,12 @@ function renderSettings() {
     renderQuestion();
     $('settings-msg').textContent = `하루 ${n}문제로 바꿨습니다. 오늘 푼 문제는 그대로 유지됩니다.`;
   });
+  const b = currentBundle(state, words);
+  segmented('bundle-options', Array.from({ length: bundleCount(words) }, (_, i) => ({ value: i, label: String(i + 1) })), b, (n) => {
+    goToBundle(n);
+    $('settings-msg').textContent = `${n + 1}묶음으로 바꿨습니다. 오늘 푼 문제는 그대로이고, 남은 문제는 새 묶음에서 나옵니다.`;
+  });
+  $('bundle-status').textContent = bundleLine(b);
   const change = (key) => (value) => {
     state = withSetting(state, key, value);
     persist();
@@ -279,8 +313,8 @@ function renderSettings() {
     renderQuestion();
     const n = words.filter((w) => isMastered(state.stats, w.id)).length;
     $('settings-msg').textContent = on
-      ? `${MASTERED_RIGHT}번 이상 맞힌 단어 ${n}개를 앞으로 내지 않습니다. 오늘 이미 푼 문제는 그대로입니다.`
-      : `${MASTERED_RIGHT}번 이상 맞힌 단어도 다시 나옵니다.`;
+      ? `연속 ${MASTERED_STREAK}번 맞힌 단어 ${n}개를 앞으로 내지 않습니다. 오늘 이미 푼 문제는 그대로입니다.`
+      : `연속 ${MASTERED_STREAK}번 맞힌 단어도 다시 나옵니다.`;
   });
   segmented('font-options', [{ value: 'small', label: '작게' }, { value: 'normal', label: '보통' }, { value: 'large', label: '크게' }, { value: 'xlarge', label: '아주 크게' }], s.fontSize, change('fontSize'));
   segmented('theme-options', [{ value: 'system', label: '기기 설정' }, { value: 'light', label: '밝게' }, { value: 'dark', label: '어둡게' }], s.theme, change('theme'));
@@ -316,7 +350,7 @@ function renderStats() {
     showPaged('stats-wrong', 'stats-pager', wrong, 1, (w, rank) => {
       const word = byId.get(w.id);
       const li = document.createElement('li');
-      li.textContent = `${rank}. ${word.en} — ${word.ko}`;
+      li.textContent = `${rank}. ${word.en} — ${meaningLabel(word)}`;
       const meta = document.createElement('span');
       meta.className = 'meta';
       meta.textContent = `틀림 ${w.wrong} · 맞음 ${w.right}`;

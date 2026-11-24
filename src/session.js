@@ -2,6 +2,7 @@ import { weightedSample } from './sampler.js';
 import { getWeight, applyAnswer } from './weights.js';
 import { DEFAULT_DAILY_COUNT, DAILY_COUNT_OPTIONS, isValidDailyCount } from './settings.js';
 import { emptyStats, recordStat, isMastered } from './stats.js';
+import { studyPools, clampBundle, REVIEW_RATIO } from './bundles.js';
 
 export { DAILY_COUNT_OPTIONS };
 export const DAILY_COUNT = DEFAULT_DAILY_COUNT;
@@ -23,13 +24,30 @@ function askable(state) {
 export function ensureTodaySession(state, words, now, rng) {
   const date = todayString(now);
   if (state.session && state.session.date === date) return state;
-  const ids = weightedSample(
-    words.map((w) => w.id).filter(askable(state)),
-    (id) => getWeight(state.weights, id),
-    state.settings?.dailyCount ?? DAILY_COUNT,
-    rng,
-  );
+  const ids = pickIds(state, words, state.settings?.dailyCount ?? DAILY_COUNT, new Set(), rng);
   return { ...state, session: { date, ids, answers: {} } };
+}
+
+// Weighted picks of `count` new questions, none in `taken`: words of the current bundle (plus
+// unlearned leftovers of earlier ones), with about REVIEW_RATIO of the questions given to learned
+// words of earlier bundles. If either pool runs short the other fills in. The two are mixed.
+function pickIds(state, words, count, taken, rng) {
+  if (count <= 0) return [];
+  const ok = askable(state);
+  const free = (id) => !taken.has(id) && ok(id);
+  const weight = (id) => getWeight(state.weights, id);
+  const pools = studyPools(state, words);
+  const main = pools.main.filter(free);
+  const review = pools.review.filter(free);
+  const reviewWanted = Math.min(review.length, Math.round(count * REVIEW_RATIO));
+  const fromMain = weightedSample(main, weight, count - reviewWanted, rng);
+  const fromReview = weightedSample(review, weight, count - fromMain.length, rng);
+  const ids = [...fromMain, ...fromReview];
+  for (let i = ids.length - 1; i > 0; i--) {
+    const j = Math.floor(rng() * (i + 1));
+    [ids[i], ids[j]] = [ids[j], ids[i]];
+  }
+  return ids;
 }
 
 export function currentIndex(session) {
@@ -76,11 +94,11 @@ export function shouldStartNewSession(state, now, { finished, hiddenMs }) {
 // Rebuild today's unanswered questions to match the settings: answered words are always kept,
 // unanswered ones that may no longer be asked are dropped, then the rest is trimmed or topped up
 // with new weighted picks.
-function refitSession(state, words, rng) {
+function refitSession(state, words, rng, { dropUnanswered = false } = {}) {
   const session = state.session;
   if (!session) return state;
   const count = state.settings?.dailyCount ?? DAILY_COUNT;
-  const ok = askable(state);
+  const ok = dropUnanswered ? () => false : askable(state);
 
   const isAnswered = (id) => id in session.answers;
   const answeredCount = session.ids.filter(isAnswered).length;
@@ -90,11 +108,7 @@ function refitSession(state, words, rng) {
   let ids = session.ids.filter((id) => isAnswered(id) || keep.has(id));
 
   const extra = need - keep.size;
-  if (extra > 0) {
-    const taken = new Set(ids);
-    const pool = words.map((w) => w.id).filter((id) => !taken.has(id) && ok(id));
-    ids = [...ids, ...weightedSample(pool, (id) => getWeight(state.weights, id), extra, rng)];
-  }
+  if (extra > 0) ids = [...ids, ...pickIds(state, words, extra, new Set(ids), rng)];
   return { ...state, session: { ...session, ids } };
 }
 
@@ -104,11 +118,18 @@ export function setDailyCount(state, words, count, rng) {
   return refitSession({ ...state, settings: { ...state.settings, dailyCount: count } }, words, rng);
 }
 
-// Turn hiding of learned words (answered right MASTERED_RIGHT+ times) on or off. Turning it on
+// Turn hiding of learned words (answered right MASTERED_STREAK times in a row) on or off. Turning it on
 // swaps learned words out of today's unanswered questions right away.
 export function setHideMastered(state, words, on, rng) {
   if (typeof on !== 'boolean') return state;
   return refitSession({ ...state, settings: { ...state.settings, hideMastered: on } }, words, rng);
+}
+
+// Switch to studying bundle b. Today's answered questions stay; the unanswered ones are re-picked
+// from the new bundle right away.
+export function setBundle(state, words, b, rng) {
+  if (!Number.isInteger(b) || clampBundle(words, b) !== b) return state;
+  return refitSession({ ...state, settings: { ...state.settings, bundle: b } }, words, rng, { dropUnanswered: true });
 }
 
 // After the word list changes: remove not-yet-answered words that no longer exist from today's session.

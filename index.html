@@ -22,14 +22,18 @@
     <h2>하루 문제 수</h2>
     <div id="daily-options" class="segmented" role="group" aria-label="하루 문제 수"></div>
 
+    <h2>학습 묶음 <span class="hint">(900개씩)</span></h2>
+    <div id="bundle-options" class="segmented" role="group" aria-label="학습 묶음"></div>
+    <p id="bundle-status" class="menu-msg"></p>
+
     <h2>정답이면 자동으로 다음 문제</h2>
     <div id="auto-options" class="segmented" role="group" aria-label="자동 다음"></div>
 
     <h2>발음 자동 재생</h2>
     <div id="play-options" class="segmented" role="group" aria-label="발음 자동 재생"></div>
 
-    <h2>5번 이상 맞힌 단어 그만 내기</h2>
-    <div id="mastered-options" class="segmented" role="group" aria-label="5번 이상 맞힌 단어 그만 내기"></div>
+    <h2>외운 단어(연속 3번 정답) 그만 내기</h2>
+    <div id="mastered-options" class="segmented" role="group" aria-label="외운 단어 그만 내기"></div>
 
     <h2>글자 크기</h2>
     <div id="font-options" class="segmented" role="group" aria-label="글자 크기"></div>
@@ -66,6 +70,8 @@
     <section id="done" hidden>
       <h1>오늘 학습 끝!</h1>
       <p id="done-summary"></p>
+      <p id="done-bundle"></p>
+      <button id="done-next-bundle" class="wide-btn" type="button" hidden></button>
       <h2>오늘 틀린 단어</h2>
       <ul id="done-wrong" class="wrong-list"></ul>
       <nav id="done-pager" class="pager" aria-label="오늘 틀린 단어 페이지" hidden></nav>

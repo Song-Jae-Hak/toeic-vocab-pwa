@@ -27,7 +27,7 @@ function validStats(s) {
   if (!isObject(s) || !isObject(s.words) || !isObject(s.days)) return false;
   const count = (n) => Number.isInteger(n) && n >= 0;
   return (
-    Object.values(s.words).every((w) => isObject(w) && count(w.right) && count(w.wrong)) &&
+    Object.values(s.words).every((w) => isObject(w) && count(w.right) && count(w.wrong) && (w.streak === undefined || count(w.streak))) &&
     Object.values(s.days).every((d) => isObject(d) && count(d.n) && count(d.right))
   );
 }

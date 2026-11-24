@@ -205,7 +205,7 @@ test('recordAnswer updates the long-term stats once per word, with the session d
   const a = ensureTodaySession(emptyState(), words(1000), day1, lcg(1));
   const id = a.session.ids[0];
   const r1 = recordAnswer(a, id, 0, true);
-  assert.deepEqual(r1.stats.words[id], { right: 1, wrong: 0 });
+  assert.deepEqual(r1.stats.words[id], { right: 1, wrong: 0, streak: 1 });
   assert.deepEqual(r1.stats.days['2026-11-15'], { n: 1, right: 1 });
   const r2 = recordAnswer(r1, id, 1, false); // repeated answer is ignored
   assert.deepEqual(r2.stats, r1.stats);
@@ -215,7 +215,7 @@ test('모르겠다 counts as wrong in the stats', () => {
   const a = ensureTodaySession(emptyState(), words(1000), day1, lcg(1));
   const id = a.session.ids[0];
   const r = recordAnswer(a, id, UNKNOWN_INDEX, true);
-  assert.deepEqual(r.stats.words[id], { right: 0, wrong: 1 });
+  assert.deepEqual(r.stats.words[id], { right: 0, wrong: 1, streak: 0 });
 });
 
 import { pruneSession } from '../src/session.js';
@@ -258,18 +258,18 @@ test('pruneSession keeps already answered ids even if their word was removed (hi
 
 import { setHideMastered } from '../src/session.js';
 
-// Marks every id in `ids` as answered right 5 times.
+// Marks every id in `ids` as learned (answered right 3 times in a row).
 function mastered(st, ids) {
   const w = { ...st.stats.words };
-  for (const id of ids) w[id] = { right: 5, wrong: 0 };
+  for (const id of ids) w[id] = { right: 3, wrong: 0, streak: 3 };
   return { ...st, stats: { ...st.stats, words: w } };
 }
 
-test('with hideMastered on, a new session leaves out words answered right 5+ times', () => {
-  let st = mastered(emptyState(), Array.from({ length: 990 }, (_, i) => i + 1));
+test('with hideMastered on, a new session leaves out learned words', () => {
+  let st = mastered(emptyState(), Array.from({ length: 890 }, (_, i) => i + 1));
   st = { ...st, settings: { ...st.settings, hideMastered: true } };
   const s = ensureTodaySession(st, words(1000), day1, lcg(1)).session;
-  assert.deepEqual([...s.ids].sort((a, b) => a - b), Array.from({ length: 10 }, (_, i) => 991 + i));
+  assert.deepEqual([...s.ids].sort((a, b) => a - b), Array.from({ length: 10 }, (_, i) => 891 + i));
 });
 
 test('with hideMastered off, mastered words are still asked', () => {
@@ -306,11 +306,11 @@ test('setHideMastered ignores values that are not booleans', () => {
 test('setDailyCount tops up only with unmastered words when hideMastered is on', () => {
   let st = withAnswers(10);
   const taken = new Set(st.session.ids);
-  const free = words(1000).map((w) => w.id).filter((id) => !taken.has(id));
-  st = mastered(st, free.slice(0, 650));
+  const free = words(900).map((w) => w.id).filter((id) => !taken.has(id));
+  st = mastered(st, free.slice(0, 400));
   st = { ...st, settings: { ...st.settings, hideMastered: true } };
   const out = setDailyCount(st, words(1000), 500, lcg(11));
   const added = out.session.ids.slice(300);
-  assert.equal(added.length, 50);
-  assert.deepEqual([...added].sort((a, b) => a - b), free.slice(650));
+  assert.equal(added.length, 200);
+  assert.deepEqual([...added].sort((a, b) => a - b), free.slice(400));
 });

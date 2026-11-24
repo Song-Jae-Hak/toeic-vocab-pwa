@@ -46,7 +46,7 @@
 {"en":"obviously","pos":"adv","ko":"분명히"},
 {"en":"occasionally","pos":"adv","ko":"가끔"},
 {"en":"openly","pos":"adv","ko":"공개적으로"},
-{"en":"otherwise","pos":"adv","ko":"그렇지 않으면"},
+{"en":"otherwise","pos":"adv","ko":"그렇지 않으면","ko2":"달리"},
 {"en":"overly","pos":"adv","ko":"지나치게"},
 {"en":"persistently","pos":"adv","ko":"끈질기게"},
 {"en":"preferably","pos":"adv","ko":"가급적"},

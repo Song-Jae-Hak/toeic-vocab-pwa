@@ -10,6 +10,7 @@ export const DEFAULT_SETTINGS = Object.freeze({
   fontSize: 'normal',
   theme: 'system',
   hideMastered: false,
+  bundle: 0,
 });
 
 export function isValidDailyCount(n) {
@@ -23,6 +24,7 @@ const CHECKS = {
   fontSize: (v) => FONT_SIZES.includes(v),
   theme: (v) => THEMES.includes(v),
   hideMastered: (v) => typeof v === 'boolean',
+  bundle: (v) => Number.isInteger(v) && v >= 0,
 };
 
 // A settings object is valid if it is an object whose present fields all have allowed values.
